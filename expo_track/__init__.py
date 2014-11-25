@@ -13,5 +13,5 @@ db = SQLAlchemy(app)
 def not_found(error):
     return render_template('404.html'), 404
 
-from .root.views import mod as root_module
-app.register_blueprint(root_module)
+from .interface.views import mod as interface_module
+app.register_blueprint(interface_module)
