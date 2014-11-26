@@ -1,5 +1,6 @@
 Flask
 Flask-Script
 Flask-SQLAlchemy
-Flask-HTTPAuth
+Flask-Login
+Flask-RESTful
 #Flask-WTF

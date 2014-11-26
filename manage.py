@@ -4,7 +4,7 @@ import os
 
 from flask.ext.script import Command, Manager, Shell
 
-from expo_track import app, db, auth, models
+from expo_track import app, db, models
 
 manager = Manager(app)
 
@@ -33,7 +33,7 @@ def initdb():
     db.session.commit()
 
 def _make_context():
-    return dict(app=app, db=db, auth=auth, models=models)
+    return dict(app=app, db=db, models=models)
 
 manager.add_command("shell", Shell(make_context=_make_context))
 

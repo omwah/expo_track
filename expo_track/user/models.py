@@ -1,9 +1,10 @@
+from flask.ext.login import UserMixin
 from werkzeug import generate_password_hash, check_password_hash
 
-from ..app import db, auth
+from ..app import db, login_manager
 from ..utils import get_current_time
 
-class User(db.Model):
+class User(db.Model, UserMixin):
     'A person who logs into the system and has certain privileges'
 
     __tablename__ = 'user'
@@ -51,7 +52,27 @@ class User(db.Model):
     # Privileges
     # can_.. = db.Column(db.Boolean)
 
-@auth.verify_password
-def verify_pw(username, password):
-    'Verify password using User model'
-    return User.authenticate(username, password)[1]
+# Login Manager callbacks
+
+@login_manager.user_loader
+def load_user(id):
+    return User.query.get(id)
+
+@login_manager.request_loader
+def load_user_from_request(request):
+    'Log in user using BasicAuth'
+
+    auth = request.authorization
+    # We need to ignore authentication headers for OPTIONS to avoid
+    # unwanted interactions with CORS.
+    # Chrome and Firefox issue a preflight OPTIONS request to check
+    # Access-Control-* headers, and will fail if it returns 401.
+    if request.method != 'OPTIONS':
+        if auth:
+            result = User.authenticate(auth.username, auth.password)
+            # Return user object only if authenfication is successful
+            if result[1]:
+                return result[0]
+    
+    # finally, return None if BasicAuth did not work
+    return None
