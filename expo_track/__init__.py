@@ -1,17 +1,7 @@
-from flask import Flask, render_template
-from flask.ext.sqlalchemy import SQLAlchemy
+# Import pieces of the application into the module space for external use
 
-# Setup application
-app = Flask(__name__)
-app.config.from_object('config')
+# Import initialized applicaton and database objects
+from app import app, db
 
-# Setup database
-db = SQLAlchemy(app)
-
-# Handle errors
-@app.errorhandler(404)
-def not_found(error):
-    return render_template('404.html'), 404
-
-from .interface.views import mod as interface_module
-app.register_blueprint(interface_module)
+# Import database models
+import all_models as models

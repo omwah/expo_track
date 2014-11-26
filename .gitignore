@@ -3,3 +3,5 @@
 *.pyc
 # Virtual Enviroment dir:
 env/
+# Instance directory for local files
+instance/

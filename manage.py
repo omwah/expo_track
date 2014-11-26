@@ -1,38 +1,29 @@
 #!/usr/bin/env python
 
+import os
+
 from flask.ext.script import Command, Manager, Shell
 
-from expo_track import app
+from expo_track import app, db, models
 
 manager = Manager(app)
 
-class sync_db(Command):
+@manager.command
+def initdb():
     """
-    Initializes the database tables.
+    Initializes and resets the database tables.
     """
-    def run(self):
-        from expo_track import db
-        db.drop_all()
-        db.create_all()
-        db.session.commit()
 
+    if not os.path.exists(app.config['INSTANCE_DIR']):
+        os.makedirs(app.config['INSTANCE_DIR'])
 
-class fixed_shell(Shell):
-    """
-    Runs a Python shell inside Flask application context.
-    """
-    def run(self, no_ipython):
-        context = self.get_context()
-        if not no_ipython:
-            try:
-                from IPython.frontend.terminal.embed import InteractiveShellEmbed
-                sh = InteractiveShellEmbedbanner1=self.banner
-                sh(global_ns=dict(), local_ns=context)
-            except ImportError:
-                pass
-        from code import interact
-        interact(banner=self.banner, local=context)
+    db.drop_all()
+    db.create_all()
+    db.session.commit()
 
-manager.add_command('syncdb', sync_db())
-manager._commands['shell'] = fixed_shell()
+def _make_context():
+    return dict(app=app, db=db, models=models)
+
+manager.add_command("shell", Shell(make_context=_make_context))
+
 manager.run()
