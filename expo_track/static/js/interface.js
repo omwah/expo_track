@@ -49,13 +49,13 @@ $( document ).ready(function() {
             json_request(self.login_uri, "GET").then(
                 function(ret_data, textStatus, jqXHR) {
                     // .done()
-                    console.log("Am I auth?");
                     self.authenticated(true);
                     self.username(ret_data['username']);
                 },
                 function(jqXHR, textStatus, errorThrown) {
                     // .failed()
                     self.authenticated(false);
+                    $loginView.css("display", "block")
                 }
             );
         }
@@ -64,7 +64,6 @@ $( document ).ready(function() {
     }
     
     var $loginView = $("#login-view");
-    $loginView.hide();
     var loginViewModel = new LoginViewModel();
     ko.applyBindings(loginViewModel);
 });
