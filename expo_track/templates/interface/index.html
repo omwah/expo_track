@@ -1,8 +1,23 @@
 {% extends "layout.html" %}
+
 {% block title %}Expo Track{% endblock %}
+
+{# Include this only for our interface template #}
+{% block additional_js %}<script src="{{ url_for('static', filename='js/interface.js') }}"></script>{% endblock %}
+
+{% block navbar_collapse %}
+    <div id="nav-user-info-view" data-bind="visible: authenticated">
+        <div class="navbar-text navbar-right">
+            <a data-bind="click: logout" href="#"><span class="glyphicon glyphicon-log-out"></span></a>
+        </div>
+        <div class="navbar-text navbar-right">
+            Username: <span data-bind="text: username"></span>
+        </div>
+    </div>
+{% endblock %}
+
 {% block body %}
     {% include "user/login.html" %}
 {% endblock %}
 
-{# Include this only for our interface template #}
-{% block additional_js %}<script src="{{ url_for('static', filename='js/interface.js') }}"></script>{% endblock %}
+

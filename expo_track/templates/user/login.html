@@ -1,5 +1,5 @@
 {# This template is intended to be included in other templates #}
-<div id="login-view" class="row">
+<div id="login-view" data-bind="visible: authenticated() == false" class="row">
     <div class="col-md-4"></div>
 
     <div class="panel panel-default col-md-4">
@@ -12,7 +12,7 @@
                 <input data-bind="value: password" type="password" id="input_password" class="form-control" placeholder="Password" required>
                 <div class="checkbox">
                     <label>
-                        <input type="checkbox" value="remember-me"> Remember me
+                        <input data-bind="value: remember_me" type="checkbox" value="remember_me"> Remember me
                     </label>
                 </div>
                 <button data-bind="click: login" class="btn btn-lg btn-primary btn-block" type="submit">Sign in</button>
