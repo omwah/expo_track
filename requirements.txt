@@ -1,4 +1,5 @@
 Flask
 Flask-Script
 Flask-SQLAlchemy
-Flask-WTF
+Flask-HTTPAuth
+#Flask-WTF

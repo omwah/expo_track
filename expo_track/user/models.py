@@ -1,6 +1,6 @@
 from werkzeug import generate_password_hash, check_password_hash
 
-from ..app import db
+from ..app import db, auth
 from ..utils import get_current_time
 
 class User(db.Model):
@@ -50,3 +50,8 @@ class User(db.Model):
 
     # Privileges
     # can_.. = db.Column(db.Boolean)
+
+@auth.verify_password
+def verify_pw(username, password):
+    'Verify password using User model'
+    return User.authenticate(username, password)[1]

@@ -17,7 +17,7 @@ class Event(db.Model):
 
     logo_filename = db.Column(db.String(1024))
 
-    locations = db.relationship('Location', backref=db.backref('event', lazy='dynamic'))
+    locations = db.relationship('Location', backref=db.backref('event'))
 
 class Location(db.Model):
     'A location such as a room at an event'

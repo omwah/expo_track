@@ -1,4 +1,4 @@
-from flask import Blueprint, request, render_template, url_for
+from flask import Blueprint, render_template
 
 # Root level of application
 mod = Blueprint('interface', __name__, url_prefix='')

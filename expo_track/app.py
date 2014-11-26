@@ -1,9 +1,13 @@
 from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
+from flask.ext.httpauth import HTTPBasicAuth
 
 # Setup application
 app = Flask(__name__)
 app.config.from_object('config')
+
+# HTTP Basic Authentification. Protect with HTTPS to secure
+auth  = HTTPBasicAuth()
 
 # Setup database
 db = SQLAlchemy(app)

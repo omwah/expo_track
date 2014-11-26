@@ -10,9 +10,9 @@ class Person(db.Model):
     given_name = db.Column(db.String(128), nullable=False)
     family_name = db.Column(db.String(128))
 
-    addresses = db.relationship('Address', backref=db.backref('person', lazy='dynamic'), cascade='all, delete, delete-orphan')
-    phone_numbers = db.relationship('Phone', backref=db.backref('person', lazy='dynamic'), cascade='all, delete, delete-orphan')
-    email = db.relationship('Email', backref=db.backref('person', lazy='dynamic'), cascade='all, delete, delete-orphan')
+    addresses = db.relationship('Address', backref=db.backref('person'), cascade='all, delete, delete-orphan')
+    phone_numbers = db.relationship('Phone', backref=db.backref('person'), cascade='all, delete, delete-orphan')
+    email = db.relationship('Email', backref=db.backref('person'), cascade='all, delete, delete-orphan')
 
 class Address(db.Model):
     'An address of an a person'

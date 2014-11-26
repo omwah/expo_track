@@ -13,7 +13,7 @@ class Item(db.Model):
     owner = db.relationship('Team', backref=db.backref('owned_items', lazy='dynamic'))
     owner_id = db.Column(db.Integer, db.ForeignKey('team.id'))
 
-    actions = db.relationship('Action', backref=db.backref('item', lazy='dynamic'))
+    actions = db.relationship('Action', backref=db.backref('item'))
 
 class Action(db.Model):
     'An action performed by an individual on an item at an event'
