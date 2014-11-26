@@ -1,6 +1,7 @@
 from flask import Flask, render_template
 from flask.ext.sqlalchemy import SQLAlchemy
 from flask.ext.login import LoginManager
+from flask.ext import restful
 
 # Setup application
 app = Flask(__name__)
@@ -18,6 +19,13 @@ db = SQLAlchemy(app)
 def not_found(error):
     return render_template('404.html'), 404
 
-# Register modules
-from .interface.views import mod as interface_module
-app.register_blueprint(interface_module)
+# Restful API
+api = restful.Api(app)
+
+# Add API resources
+from .user.api import Login
+api.add_resource(Login, '/api/login', endpoint='login')
+
+# Add Blueprints to application
+from .interface.views import mod as interface_mod
+app.register_blueprint(interface_mod)

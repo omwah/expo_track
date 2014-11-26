@@ -1,3 +1,8 @@
-{% extends 'base.html' %}
-{% block title %}Hello World{% endblock %}
-{% block body %}<h1>Hello, World!</h1>{% endblock %}
+{% extends "layout.html" %}
+{% block title %}Expo Track{% endblock %}
+{% block body %}
+    {% include "user/login.html" %}
+{% endblock %}
+
+{# Include this only for our interface template #}
+{% block additional_js %}<script src="{{ url_for('static', filename='js/interface.js') }}"></script>{% endblock %}
