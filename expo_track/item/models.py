@@ -10,6 +10,8 @@ class Item(db.Model):
     name = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(1024))
 
+    tracking_number = db.Column(db.Integer)
+
     owner = db.relationship('Team', backref=db.backref('owned_items', lazy='dynamic'))
     owner_id = db.Column(db.Integer, db.ForeignKey('team.id'))
 
@@ -26,6 +28,7 @@ class Action(db.Model):
 
     type = db.Column(db.Integer, nullable=False)
     time = db.Column(db.DateTime, default=get_current_time, nullable=False)
+    note = db.Column(db.String(1024))
 
     person = db.relationship('Person', backref=db.backref('actions', lazy='dynamic'))
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'), nullable=False)

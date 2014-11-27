@@ -50,7 +50,12 @@ class User(db.Model, UserMixin):
         return user, authenticated
 
     # Privileges
-    # can_.. = db.Column(db.Boolean)
+    can_edit_items = db.Column(db.Boolean)
+    can_perform_action = db.Column(db.Boolean)
+    can_edit_people = db.Column(db.Boolean)
+    can_edit_events = db.Column(db.Boolean)
+    can_edit_locations = db.Column(db.Boolean)
+    can_edit_teams = db.Column(db.Boolean)
 
 # Login Manager callbacks
 
