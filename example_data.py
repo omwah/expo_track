@@ -3,6 +3,19 @@
 # 2. $ python manage.py shell
 # 3. %run -i example_data.py
 
+# Administrator account
+admin_person = models.Person(given_name='Admin')
+admin_user = models.User(name='admin',
+                         password='123456',
+                         person=admin_person,
+                         can_edit_items = True,
+                         can_perform_action = True,
+                         can_edit_people = True,
+                         can_edit_events = True,
+                         can_edit_locations = True,
+                         can_edit_teams = True)
+db.session.add(admin_user)
+
 linux_expo = models.Event(name="Southern California Linux Expo",
                           description="SCALE's mission is to provide educational opportunities on the topic of Open Source software. Open Source software is any software that meets the litmus test of the OSI (Open Source Initiative)")
 db.session.add(linux_expo)
