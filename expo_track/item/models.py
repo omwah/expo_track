@@ -27,7 +27,7 @@ class Action(db.Model):
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'))
 
     type = db.Column(db.Integer, nullable=False)
-    time = db.Column(db.DateTime, default=get_current_time, nullable=False)
+    date = db.Column(db.DateTime, default=get_current_time, nullable=False)
     note = db.Column(db.String(1024))
 
     person = db.relationship('Person', backref=db.backref('actions', lazy='dynamic'))

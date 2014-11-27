@@ -1,11 +1,9 @@
-from flask import request
-
 from flask.ext.restful import Resource, reqparse
 from flask.ext.login import current_user, login_user, logout_user
 
 from models import User
 
-class Login(Resource):
+class LoginResource(Resource):
     'Allow login via the API to get the session cookie'
 
     parser = reqparse.RequestParser()
@@ -35,3 +33,6 @@ class Login(Resource):
             return { 'username': user.name, 'authenticated': True }
         else:
             return { 'authenticated': False }, 401 
+
+def register_api(api):
+    api.add_resource(LoginResource, '/api/login', endpoint='login')

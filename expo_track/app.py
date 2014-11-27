@@ -22,9 +22,20 @@ def not_found(error):
 # Restful API
 api = restful.Api(app)
 
-# Add API resources
-from .user.api import Login
-api.add_resource(Login, '/api/login', endpoint='login')
+# Add API resources. Use register functions so we can
+# keep everything localized to modules
+from .user.api import register_api as register_api_user
+register_api_user(api)
+
+from .person.api import register_api as register_api_person
+register_api_person(api)
+
+from .event.api import register_api as register_api_event
+register_api_event(api)
+
+from .item.api import register_api as register_api_item
+register_api_item(api)
+
 
 # Add Blueprints to application
 from .interface.views import mod as interface_mod
