@@ -12,17 +12,6 @@
     <script src="{{ url_for('static', filename='js/interface.js') }}"></script>
 {% endblock %}
 
-{% block navbar_collapse %}
-    <div id="nav-user-info-view" data-bind="with: auth, visible: auth().authenticated">
-        <div class="navbar-text navbar-right">
-            <a data-bind="click: logout" href="#"><span class="glyphicon glyphicon-log-out"></span></a>
-        </div>
-        <div class="navbar-text navbar-right">
-            Username: <span data-bind="text: username"></span>
-        </div>
-    </div>
-{% endblock %}
-
 {% block body %}
     {% include "user/login.html" %}
     {% include "item/action_buttons.html" %}

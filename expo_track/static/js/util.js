@@ -6,9 +6,6 @@ var json_request = function(uri, method, data) {
                            cache: false,
                            dataType: "json",
                            data: ko.toJSON(data),
-                           error: function(jqXHR) {
-                               console.log("ajax error " + jqXHR.status);
-                           },
                          });
     return request;
 }
