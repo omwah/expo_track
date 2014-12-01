@@ -7,6 +7,7 @@
         <title>{% block title %}{% endblock %}</title>
 
         <link href="{{ url_for('static', filename='css/bootstrap.min.css') }}" rel="stylesheet">
+        <link href="{{ url_for('static', filename='css/selectize.bootstrap3.css') }}" rel="stylesheet">
         <link href="{{ url_for('static', filename='css/style.css') }}" rel="stylesheet">
 
         <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
@@ -22,6 +23,7 @@
         <script src="{{ url_for('static', filename='js/jquery-2.1.1.js') }}"></script>
         <script src="{{ url_for('static', filename='js/bootstrap.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/knockout-3.2.0.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/selectize.min.js') }}"></script>
         {% block additional_js %}{% endblock %}
     </body>
 </html>

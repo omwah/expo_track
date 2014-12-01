@@ -6,7 +6,10 @@
 {% block additional_js %}
     <script type="text/javascript">
         var login_uri = "{{ url_for('login') }}";
-        var actions_uri = "{{ url_for('action_list') }}";
+        var items_uri = "{{ url_for('items_list') }}";
+        var people_uri = "{{ url_for('people_list') }}";
+        var action_types_uri = "{{ url_for('action_types') }}";
+        var actions_uri = "{{ url_for('actions_list') }}";
     </script>
     <script src="{{ url_for('static', filename='js/util.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface.js') }}"></script>
@@ -14,7 +17,7 @@
 
 {% block body %}
     {% include "user/login.html" %}
-    {% include "item/action_buttons.html" %}
+    {% include "item/perform_action.html" %}
     {% include "item/recent_actions.html" %}
 {% endblock %}
 

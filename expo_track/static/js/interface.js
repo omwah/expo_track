@@ -68,18 +68,26 @@ var auth_view_model = new AuthViewModel();
 // Action interactions
 // -------------------
 
-function ActionModel(data) {
+function ItemModel(data) {
     var self = this;
 
-    self.date = ko.observable(data.date);
-    self.item = ko.observable(data.item.name);
-    self.type = ko.observable(data.type.name);
-    self.given_name = ko.observable(data.person.given_name);
-    self.family_name = ko.observable(data.person.family_name);
-    self.who = ko.computed(function() {
+    self.id = ko.observable(data.id);
+    self.name = ko.observable(data.name);
+    self.description = ko.observable(data.description);
+    self.tracking_number = ko.observable(data.tracking_number);
+    self.uri = ko.observable(data.uri);
+}
+
+function PersonModel(data) {
+    var self = this;
+    self.id = ko.observable(data.id);
+    self.given_name = ko.observable(data.given_name);
+    self.family_name = ko.observable(data.family_name);
+    self.uri = ko.observable(data.uri);
+    self.display_name = ko.computed(function() {
         var given_name = self.given_name();
         var family_name = self.family_name();
-        if (family_name.len > 0) {
+        if (family_name !== null && family_name.length > 0) {
             return family_name + ", " + given_name;
         } else {
             return given_name;
@@ -87,31 +95,101 @@ function ActionModel(data) {
     });
 }
 
-function RecentActionsModel() {
+function ActionItemModel(data) {
     var self = this;
 
-    self.recent_actions = ko.observableArray([]);
+    self.id = ko.observable(data.id);
+    self.date = ko.observable(data.date);
+    self.item = ko.observable(data.item.name);
+    self.type = ko.observable(data.type.name);
+    self.who = ko.observable(new PersonModel(data.person));
+    self.uri = ko.observable(data.uri);
+}
 
-    self.load_actions = function() {
-        self.recent_actions([]);
+function PerformActionModel() {
+    var self = this;
+
+    self.selected_type = ko.observable("0");
+    self.available_items = ko.observableArray([]);
+    self.selected_item = ko.observableArray([]);
+    self.people = ko.observable();
+    self.selected_person = ko.observable();
+
+    self.load_items = function() {
+        send_data = "action_type=" + self.selected_type();
+        json_request(items_uri, "GET", send_data).done(function(ret_data) {
+            var mapped_items = $.map(ret_data, function(item) { 
+                return new ItemModel(item); 
+            });
+            self.available_items(mapped_items);
+        });
+
+        // When used as click handler, allow default event handling
+        return true;
+    };
+
+    self.load_people = function() {
+        json_request(people_uri, "GET").done(function(ret_data) {
+            var mapped_people = $.map(ret_data, function(person) {
+                return new PersonModel(person);
+            });
+            self.people(mapped_people);
+        });
+
+        // When used as click handler, allow default event handling
+        return true;
+    };
+}
+
+var perform_action_model = new PerformActionModel();
+
+function ActionsModel() {
+    var self = this;
+
+    self.recent = ko.observableArray([]);
+    self.perform = ko.observable(perform_action_model);
+    //self.action_types = ko.observableArray([]);
+
+    self.load_recent = function() {
+        self.recent([]);
         json_request(actions_uri, "GET").done(function(ret_data) {
             var mapped_actions = $.map(ret_data, function(action) { 
-                return new ActionModel(action); 
+                return new ActionItemModel(action); 
             });
-            self.recent_actions(mapped_actions);
+            self.recent(mapped_actions);
         });
     };
 
+    /*self.load_action_types = function() {
+        json_request(action_types_uri, "GET").done(function(ret_data) {
+            self.action_types(ret_data);
+        });
+    };*/
+
     $(document).on("login", function() {
-        self.load_actions();
+        /*// Keep this loaded on page even after logging out
+        if(self.action_types.length == 0) {
+            self.load_action_types();
+        }*/
+
+        self.load_recent();
     });
 
     $(document).on("logout", function() {
-        self.recent_actions([]);
+        // Clear items on page on logout
+        self.recent([]);
     });
+
+    self.begin_action = function() {
+        $("#perform-action-modal").modal("show");
+    }
+
+    self.finish_action = function() {
+        $("#perform-action-modal").modal("hide");
+    }
 }
 
-var recent_actions_model = new RecentActionsModel();
+var actions_model = new ActionsModel();
 
 // ----------
 // Base model
@@ -121,7 +199,7 @@ var base_view_model = function() {
     var self = this;
 
     self.auth = ko.observable(auth_view_model);
-    self.actions = ko.observable(recent_actions_model);
+    self.actions = ko.observable(actions_model);
 };
 
 ko.applyBindings(base_view_model);

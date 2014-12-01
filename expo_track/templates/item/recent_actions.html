@@ -5,12 +5,12 @@
             <thead>
                 <tr><th>Date</th><th>Item</th><th>Action</th><th>Who</th></tr>
             </thead>
-            <tbody data-bind="foreach: recent_actions">
+            <tbody data-bind="foreach: recent">
                 <tr>
                     <td data-bind="text: date"></td>
                     <td data-bind="text: item"></td>
                     <td data-bind="text: type"></td>
-                    <td data-bind="text: who"></td>
+                    <td data-bind="text: who().display_name"></td>
                 </tr>    
             </tbody>
         </table>

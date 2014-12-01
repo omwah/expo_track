@@ -1,0 +1,61 @@
+<div  data-bind="with: actions, visible: auth().authenticated" class="row">
+    <div class="col-md-5"></div>
+    <div class="col-md-2">
+        <button data-bind="click: begin_action" type="button" class="btn btn-primary btn-lg">Check In/Out</button>
+    </div>
+    <div class="col-md-5"></div>
+</div>
+
+<div id="perform-action-modal" class="modal">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
+                <h4 class="modal-title">Item Action</h4>
+            </div>
+            <div data-bind="with: actions().perform" class="modal-body">
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="action-types">Action</label>
+                    </div>
+                </div>
+                    <div id="row">
+                    {% for type_code, type_name in action_types  %}
+                    <div class="col-md-{{ (12 / action_types|length)|int }}">
+                        <label class="radio-inline">
+                            <input data-bind="checked: selected_type, click: load_items" type="radio" name="action-type" value="{{ type_code }}">{{ type_name }}
+                        </label>
+                    </div>
+                    {% endfor %}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="item-select">Item</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <select data-bind="options: available_items, optionsText: 'name', optionsValue: 'id', value: 'selected_item'" id="item-select" class="form-control"></select> 
+                    </div>
+                </div>
+                
+                <div class="row">
+                    <div class="col-md-12">
+                        <label for="who-select">Who</label>
+                    </div>
+                </div>
+                <div class="row">
+                    <div class="col-md-12">
+                        <select data-bind="options: people, optionsText: 'display_name', optionsValue: 'id', value: 'selected_person'" id="who-select" class="form-control"></select> 
+                    </div>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-primary">Apply</button>
+            </div>
+        </div>
+    </div>
+</div>

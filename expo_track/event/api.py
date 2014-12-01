@@ -25,5 +25,5 @@ class TeamResource(Resource):
 
 def register_api(api):
     api.add_resource(EventResource, '/api/events/<int:id>', endpoint='event')
-    api.add_resource(EventResource, '/api/locations/<int:id>', endpoint='location')
-    api.add_resource(EventResource, '/api/teams/<int:id>', endpoint='team')
+    api.add_resource(LocationResource, '/api/locations/<int:id>', endpoint='location')
+    api.add_resource(TeamResource, '/api/teams/<int:id>', endpoint='team')
