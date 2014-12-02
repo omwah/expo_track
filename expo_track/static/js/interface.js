@@ -74,6 +74,7 @@ function ItemModel(data) {
     self.id = ko.observable(data.id);
     self.name = ko.observable(data.name);
     self.description = ko.observable(data.description);
+    self.status = ko.observable(data.status)
     self.tracking_number = ko.observable(data.tracking_number);
     self.uri = ko.observable(data.uri);
 }
@@ -101,7 +102,7 @@ function ActionItemModel(data) {
     self.id = ko.observable(data.id);
     self.date = ko.observable(data.date);
     self.item = ko.observable(data.item.name);
-    self.type = ko.observable(data.type.name);
+    self.status = ko.observable(data.status.name);
     self.who = ko.observable(new PersonModel(data.person));
     self.uri = ko.observable(data.uri);
 }
@@ -109,14 +110,14 @@ function ActionItemModel(data) {
 function PerformActionModel() {
     var self = this;
 
-    self.selected_type = ko.observable("0");
+    self.selected_status = ko.observable("0");
     self.available_items = ko.observableArray([]);
     self.selected_item = ko.observableArray([]);
     self.people = ko.observable();
     self.selected_person = ko.observable();
 
     self.load_items = function() {
-        send_data = "action_type=" + self.selected_type();
+        send_data = { "status": self.selected_status() };
         json_request(items_uri, "GET", send_data).done(function(ret_data) {
             var mapped_items = $.map(ret_data, function(item) { 
                 return new ItemModel(item); 
@@ -148,7 +149,7 @@ function ActionsModel() {
 
     self.recent = ko.observableArray([]);
     self.perform = ko.observable(perform_action_model);
-    //self.action_types = ko.observableArray([]);
+    //self.status_types = ko.observableArray([]);
 
     self.load_recent = function() {
         self.recent([]);
@@ -160,16 +161,16 @@ function ActionsModel() {
         });
     };
 
-    /*self.load_action_types = function() {
-        json_request(action_types_uri, "GET").done(function(ret_data) {
-            self.action_types(ret_data);
+    /*self.load_status_types = function() {
+        json_request(status_types_uri, "GET").done(function(ret_data) {
+            self.status_types(ret_data);
         });
     };*/
 
     $(document).on("login", function() {
         /*// Keep this loaded on page even after logging out
-        if(self.action_types.length == 0) {
-            self.load_action_types();
+        if(self.status_types.length == 0) {
+            self.load_status_types();
         }*/
 
         self.load_recent();

@@ -10,6 +10,10 @@ class Item(db.Model):
     name = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(1024))
 
+    # Current status of item, should match newest action on item
+    status = db.Column(db.Integer, nullable=False)
+    
+    # Arbitrary number for tracking item
     tracking_number = db.Column(db.Integer)
 
     owner = db.relationship('Team', backref=db.backref('owned_items', lazy='dynamic'))
@@ -26,15 +30,23 @@ class Action(db.Model):
 
     item_id = db.Column(db.Integer, db.ForeignKey('item.id'))
 
-    type = db.Column(db.Integer, nullable=False)
+    # When action occurred, leave null to get current time
     date = db.Column(db.DateTime, default=get_current_time, nullable=False)
+
+    # What status changed on the item
+    status = db.Column(db.Integer, nullable=False)
+
+    # Arbitrary note, such as to explain a missing item
     note = db.Column(db.String(1024))
 
+    # Who performed the action
     person = db.relationship('Person', backref=db.backref('actions', lazy='dynamic'))
     person_id = db.Column(db.Integer, db.ForeignKey('person.id'), nullable=False)
 
+    # Which event this event is related to
     event = db.relationship('Event', backref=db.backref('actions', lazy='dynamic'))
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'), nullable=False)
 
+    # Location where this action occurred
     location = db.relationship('Location', backref=db.backref('actions', lazy='dynamic'))
     location_id = db.Column(db.Integer, db.ForeignKey('location.id'))

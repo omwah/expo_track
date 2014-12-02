@@ -3,6 +3,11 @@
 # 2. $ python manage.py shell
 # 3. %run -i example_data.py
 
+import random
+from datetime import datetime, timedelta
+
+from expo_track.item.constants import *
+
 # Administrator account
 admin_person = models.Person(given_name='Admin')
 admin_user = models.User(name='admin',
@@ -70,7 +75,8 @@ for radio_num in range(1, 61):
     barcode = 1000 + radio_num
     name = "Radio #%02.d" % radio_num
     desc = "Etekcity Radio"
-    radio = models.Item(name=name, description=desc, tracking_number=barcode)
+    # Will update status to something different possibility in action loop
+    radio = models.Item(name=name, description=desc, status=0, tracking_number=barcode)
     items.append(radio)
     db.session.add(radio)
 
@@ -107,14 +113,18 @@ for team in teams_dict.values():
         people.append(person)
         db.session.add(person)
 
+num_actions = 100
+time_beg = datetime.now()-timedelta(hours=num_actions+1)
+
 # Add some random actions
-import random
-from expo_track.item.constants import *
-for count in range(100):
+for count in range(num_actions):
     which_item = random.randrange(len(items))
-    action_type = random.randrange(len(ACTION_TYPES.keys()))
+    status_type = random.randrange(len(STATUS_TYPES.keys()))
     which_person = random.randrange(len(people))
-    action = models.Action(item=items[which_item], type=action_type, person=people[which_person], event=linux_expo)
+    dt = time_beg + timedelta(hours=count) + timedelta(minutes=random.randrange(59))
+    action = models.Action(item=items[which_item], status=status_type, person=people[which_person], event=linux_expo, date=dt)
+    # Set current status to latest status item
+    items[which_item].status = status_type
     db.session.add(action)
 
 db.session.commit()

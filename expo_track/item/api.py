@@ -4,7 +4,7 @@ from flask.ext.login import login_required
 from ..user.decorators import can_edit_items, can_perform_action
 
 from models import Item, Action
-from constants import ACTION_TYPES
+from constants import STATUS_TYPES
 
 from ..person.api import person_fields
 
@@ -12,21 +12,22 @@ item_fields = {
     'id': fields.String,
     'name': fields.String,
     'description': fields.String,
-    'tracking_number': fields.Fixed,
+    'status': fields.String,
+    'tracking_number': fields.String,
     #'owner': fields.Nested({ 'name': fields.String,
     #                         'uri': fields.Url('team') }),
     'uri': fields.Url('item'),
 }
 
-class ActionTypeItem(fields.Raw):
+class StatusItem(fields.Raw):
     def format(self, value):
-        return { 'code': value, 'name': ACTION_TYPES.get(value, None) }
+        return { 'code': value, 'name': STATUS_TYPES.get(value, None) }
 
 action_fields = {
     'id': fields.String,
     'item': fields.Nested({ 'name': fields.String,
                             'uri': fields.Url('item') }),
-    'type': ActionTypeItem,
+    'status': StatusItem,
     'date': fields.DateTime(dt_format='rfc822'),
     'note': fields.String,
     'person': fields.Nested(person_fields),
@@ -39,7 +40,7 @@ action_fields = {
 
 class ItemListResource(Resource):
     parser = reqparse.RequestParser()
-    parser.add_argument('action_type', type=int)
+    parser.add_argument('status', type=int)
 
     @login_required
     @marshal_with(item_fields)
@@ -48,8 +49,8 @@ class ItemListResource(Resource):
 
         items_query = Item.query
 
-        if args.action_type != None:
-            items_query = items_query.join(Action).filter(Action.type == args.action_type)
+        if args.status != None:
+            items_query = items_query.filter(Item.status == args.status)
 
         return items_query.all()
 
@@ -93,16 +94,16 @@ class ActionResource(Resource):
     def post(self):
         pass
 
-class ActionTypeResource(Resource):
+class StatusTypesResource(Resource):
 
     @login_required
     def get(self):
-        return ACTION_TYPES
+        return STATUS_TYPES
 
 def register_api(api):
     api.add_resource(ItemListResource, '/api/items', endpoint='items_list')
     api.add_resource(ItemResource, '/api/items/<int:id>', endpoint='item')
     api.add_resource(ActionListResource, '/api/actions', endpoint='actions_list')
     api.add_resource(ActionResource, '/api/actions/<int:id>', endpoint='action')
-    api.add_resource(ActionTypeResource, '/api/action_types', endpoint='action_types')
+    api.add_resource(StatusTypesResource, '/api/status_types', endpoint='status_types')
 
