@@ -117,12 +117,20 @@ function PerformActionModel() {
     self.selected_person = ko.observable();
 
     self.load_items = function() {
-        send_data = { "status": self.selected_status() };
+        // Get the opposite status of the selected status.
+        // Ie. If we want to check something in, show the checked out items
+        send_data = { "status": base_view_model.opposite_status(self.selected_status()) };
         json_request(items_uri, "GET", send_data).done(function(ret_data) {
             var mapped_items = $.map(ret_data, function(item) { 
                 return new ItemModel(item); 
             });
             self.available_items(mapped_items);
+
+            // Set selected as first one
+            self.selected_item = self.available_items()[0].id();
+
+            // Select the relevant person for these items
+            self.select_relevant_person();
         });
 
         // When used as click handler, allow default event handling
@@ -136,10 +144,29 @@ function PerformActionModel() {
             });
             self.people(mapped_people);
         });
+    };
+
+    // Select the relevant person who last performed the opposite
+    // action of the one that is selected on the item selected
+    self.select_relevant_person = function() {
+        send_data = { 
+            "status": base_view_model.opposite_status(self.selected_status()),
+            "item_id": self.selected_item
+        }
+
+        json_request(actions_uri, "GET", send_data).done(function(ret_data) {
+            self.selected_person(ret_data[0].person.id);
+        });
 
         // When used as click handler, allow default event handling
         return true;
-    };
+    }
+
+    // Load data from server for when modal is newly opened
+    self.load_data = function() {
+        self.load_items();
+        self.load_people();
+    }
 }
 
 var perform_action_model = new PerformActionModel();
@@ -149,7 +176,6 @@ function ActionsModel() {
 
     self.recent = ko.observableArray([]);
     self.perform = ko.observable(perform_action_model);
-    //self.status_types = ko.observableArray([]);
 
     self.load_recent = function() {
         self.recent([]);
@@ -161,18 +187,7 @@ function ActionsModel() {
         });
     };
 
-    /*self.load_status_types = function() {
-        json_request(status_types_uri, "GET").done(function(ret_data) {
-            self.status_types(ret_data);
-        });
-    };*/
-
     $(document).on("login", function() {
-        /*// Keep this loaded on page even after logging out
-        if(self.status_types.length == 0) {
-            self.load_status_types();
-        }*/
-
         self.load_recent();
     });
 
@@ -183,6 +198,10 @@ function ActionsModel() {
 
     self.begin_action = function() {
         $("#perform-action-modal").modal("show");
+
+        // Load data each time modal is showed so that
+        // it always has fresh data
+        perform_action_model.load_data();
     }
 
     self.finish_action = function() {
@@ -196,12 +215,34 @@ var actions_model = new ActionsModel();
 // Base model
 // ----------
 
-var base_view_model = function() {
+function BaseViewModel() {
     var self = this;
 
     self.auth = ko.observable(auth_view_model);
+    self.status_def = null;
     self.actions = ko.observable(actions_model);
+
+    self.load_status_def = function() {
+        json_request(status_def_uri, "GET").done(function(ret_data) {
+            self.status_def = ret_data;
+        });
+    };
+
+    $(document).on("login", function() {
+        // Keep this loaded on page even after logging out
+        // and only load it once
+        if(self.status_def === null) {
+            self.load_status_def();
+        }
+    });
+
+    self.opposite_status = function(status_code) {
+        return self.status_def.opposites[status_code];
+    }
+
 };
+
+var base_view_model = new BaseViewModel();
 
 ko.applyBindings(base_view_model);
 
