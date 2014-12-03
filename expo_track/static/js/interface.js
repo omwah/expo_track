@@ -126,11 +126,13 @@ function PerformActionModel() {
             });
             self.available_items(mapped_items);
 
-            // Set selected as first one
-            self.selected_item(self.available_items()[0].id());
+            // Set selected as first one, but only if there is an item to pick
+            if (self.available_items().length > 0) {
+                self.selected_item(self.available_items()[0].id());
 
-            // Select the relevant person for these items
-            self.select_relevant_person();
+                // Select the relevant person for these items
+                self.select_relevant_person();
+            }
         });
 
         // When used as click handler, allow default event handling
@@ -149,14 +151,20 @@ function PerformActionModel() {
     // Select the relevant person who last performed the opposite
     // action of the one that is selected on the item selected
     self.select_relevant_person = function() {
-        send_data = { 
-            "status": base_view_model.opposite_status(self.selected_status()),
-            "item_id": self.selected_item
-        }
+        if(self.selected_item()) {
+            send_data = { 
+                "status": base_view_model.opposite_status(self.selected_status()),
+                "item_id": self.selected_item()
+            }
 
-        json_request(actions_uri, "GET", send_data).done(function(ret_data) {
-            self.selected_person(ret_data[0].person.id);
-        });
+            json_request(actions_uri, "GET", send_data).done(function(ret_data) {
+                // Only select a person if the person data coming back is not null.
+                // will be null when no person has performed a certain action on an item yet
+                if (ret_data.length > 0 && ret_data[0].person) {
+                    self.selected_person(ret_data[0].person.id);
+                }
+            });
+        }
 
         // When used as click handler, allow default event handling
         return true;
