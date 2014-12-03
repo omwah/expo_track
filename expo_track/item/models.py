@@ -28,7 +28,7 @@ class Action(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    item_id = db.Column(db.Integer, db.ForeignKey('item.id'))
+    item_id = db.Column(db.Integer, db.ForeignKey('item.id'), nullable=False)
 
     # When action occurred, leave null to get current time
     date = db.Column(db.DateTime, default=get_current_time, nullable=False)

@@ -1,6 +1,8 @@
 from flask.ext.restful import Resource, fields, marshal_with
 from flask.ext.login import login_required
 
+from ..utils import SafeUrlField
+
 from ..user.decorators import can_edit_people
 
 from models import Person, Address, Phone, Email
@@ -9,7 +11,7 @@ person_fields = {
     'id': fields.String,
     'given_name': fields.String,
     'family_name': fields.String,
-    'uri': fields.Url('person'),
+    'uri': SafeUrlField('person'),
 }
 
 class PeopleListResource(Resource):

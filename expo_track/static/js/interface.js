@@ -112,7 +112,7 @@ function PerformActionModel() {
 
     self.selected_status = ko.observable("0");
     self.available_items = ko.observableArray([]);
-    self.selected_item = ko.observableArray([]);
+    self.selected_item = ko.observable();
     self.people = ko.observable();
     self.selected_person = ko.observable();
 
@@ -127,7 +127,7 @@ function PerformActionModel() {
             self.available_items(mapped_items);
 
             // Set selected as first one
-            self.selected_item = self.available_items()[0].id();
+            self.selected_item(self.available_items()[0].id());
 
             // Select the relevant person for these items
             self.select_relevant_person();
@@ -206,6 +206,17 @@ function ActionsModel() {
 
     self.finish_action = function() {
         $("#perform-action-modal").modal("hide");
+
+        // Save changes to server and update recents list
+        action_data = { 'status': self.perform().selected_status(),
+                        'person_id': self.perform().selected_person(),
+                        'item_id': self.perform().selected_item(),
+                        'event_id': 1 }
+        json_request(actions_uri, "POST", action_data).done(function(ret_data) {
+            created_action = new ActionItemModel(ret_data); 
+            self.recent.unshift(created_action);
+        });
+
     }
 }
 
