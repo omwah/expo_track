@@ -37,7 +37,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <select data-bind="options: available_items, optionsText: 'name', optionsValue: 'id', value: selected_item, click: select_relevant_person" id="item-select" class="form-control"></select> 
+                        <select data-bind="options: available_items, optionsText: 'name', optionsValue: 'id', value: selected_item, click: select_relevant_person, select2: {}" id="item-select" class="form-control"></select> 
                     </div>
                 </div>
                 
@@ -48,7 +48,7 @@
                 </div>
                 <div class="row">
                     <div class="col-md-12">
-                        <select data-bind="options: people, optionsText: 'display_name', optionsValue: 'id', value: selected_person" id="who-select" class="form-control"></select> 
+                        <select data-bind="options: people, optionsText: 'display_name', optionsValue: 'id', value: selected_person, select2: {}" id="who-select" class="form-control"></select> 
                     </div>
                 </div>
             </div>
