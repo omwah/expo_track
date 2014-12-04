@@ -8,6 +8,7 @@ function ItemModel(data) {
     self.description = ko.observable(data.description);
     self.status = ko.observable(data.status)
     self.tracking_number = ko.observable(data.tracking_number);
+    // owner 
     self.uri = ko.observable(data.uri);
 }
 
@@ -26,4 +27,12 @@ function PersonModel(data) {
             return given_name;
         }
     });
+}
+
+function UserModel(data) {
+    var self = this;
+
+    self.name = ko.observable(data.name);
+    self.person = ko.obervable(new PersonModel(data));
+    self.permissions = ko.observableArray(data.permissions);
 }

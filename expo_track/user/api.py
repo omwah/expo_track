@@ -1,7 +1,9 @@
-from flask.ext.restful import Resource, reqparse
-from flask.ext.login import current_user, login_user, logout_user
+from flask.ext.restful import Resource, fields, marshal_with, reqparse
+from flask.ext.login import current_user, login_user, logout_user, login_required
 
 from models import User
+
+from ..person.api import person_fields
 
 class LoginResource(Resource):
     'Allow login via the API to get the session cookie'
@@ -34,5 +36,24 @@ class LoginResource(Resource):
         else:
             return { 'authenticated': False }, 401 
 
+class PermissionField(fields.Raw):
+    def format(self, value):
+        return [ p.name for p in value ]
+
+user_fields = {
+    'name': fields.String,
+    'person': fields.Nested(person_fields),
+    'permissions': PermissionField,
+}
+
+class UserResource(Resource):
+
+    @login_required
+    @marshal_with(user_fields)
+    def get(self):
+        return current_user
+
+
 def register_api(api):
     api.add_resource(LoginResource, '/api/login', endpoint='login')
+    api.add_resource(UserResource, '/api/user', endpoint='user')

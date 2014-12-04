@@ -29,6 +29,7 @@
 
         <script type="text/javascript">
             var login_uri = "{{ url_for('login') }}";
+            var user_uri = "{{ url_for('user') }}";
             var items_uri = "{{ url_for('items_list') }}";
             var people_uri = "{{ url_for('people_list') }}";
             var status_def_uri = "{{ url_for('status_def') }}";
@@ -37,6 +38,7 @@
 
         <script src="{{ url_for('static', filename='js/util.js') }}"></script>
         <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/api_models.js') }}"></script>
         {% block additional_js %}{% endblock %}
     </body>
 </html>
