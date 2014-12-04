@@ -3,7 +3,7 @@ from flask.ext.login import login_required
 
 from ..utils import SafeUrlField
 
-from ..user.decorators import can_edit_people
+from ..user.decorators import has_permission
 
 from models import Person, Address, Phone, Email
 

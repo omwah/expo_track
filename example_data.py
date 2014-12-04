@@ -12,14 +12,13 @@ from expo_track.item.constants import *
 admin_person = models.Person(given_name='Admin')
 admin_user = models.User(name='admin',
                          password='123456',
-                         person=admin_person,
-                         can_edit_items = True,
-                         can_perform_action = True,
-                         can_edit_people = True,
-                         can_edit_events = True,
-                         can_edit_locations = True,
-                         can_edit_teams = True)
+                         person=admin_person)
 db.session.add(admin_user)
+
+# Give admin all permissions
+perm_names = [ p.name for p in models.Permission.query.all() ]
+for pname in perm_names:
+    admin_user.grant_permission(pname)
 
 linux_expo = models.Event(name="Southern California Linux Expo",
                           description="SCALE's mission is to provide educational opportunities on the topic of Open Source software. Open Source software is any software that meets the litmus test of the OSI (Open Source Initiative)")

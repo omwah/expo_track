@@ -1,7 +1,7 @@
 from flask.ext.restful import Resource, fields, marshal_with
 from flask.ext.login import login_required
 
-from ..user.decorators import can_edit_events
+from ..user.decorators import has_permission
 
 from models import Event, Location, Team
 

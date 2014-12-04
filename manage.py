@@ -17,6 +17,11 @@ def initdb():
 
     db.drop_all()
     db.create_all()
+
+    # Add user permission types
+    from expo_track.user.models import create_permission_types
+    create_permission_types()
+
     db.session.commit()
 
 def _make_context():

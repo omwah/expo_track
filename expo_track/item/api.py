@@ -4,7 +4,7 @@ from sqlalchemy.sql.expression import asc, desc
 
 from ..app import db
 from ..utils import SafeUrlField
-from ..user.decorators import can_edit_items, can_perform_action
+from ..user.decorators import has_permission
 
 from models import Item, Action
 from constants import STATUS_TYPES, STATUS_OPPOSITES
@@ -66,17 +66,17 @@ class ItemResource(Resource):
         return Item.query.filter(Item.id == id).first_or_404()
 
     @login_required
-    @can_edit_items
+    @has_permission('add_item')
     def post(self):
         pass
 
     @login_required
-    @can_edit_items
+    @has_permission('edit_item')
     def put(self, id):
         pass
 
     @login_required
-    @can_edit_items
+    @has_permission('delete_item')
     def delete(self, id):
         pass
 
@@ -108,7 +108,7 @@ class ActionListResource(Resource):
         return actions_query.all()
 
     @login_required
-    @can_perform_action
+    @has_permission('perform_action')
     @marshal_with(action_fields)
     def post(self):
         parser = reqparse.RequestParser()

@@ -4,6 +4,11 @@ from werkzeug import generate_password_hash, check_password_hash
 from ..app import db, login_manager
 from ..utils import get_current_time
 
+user_permissions = db.Table('user_permissions',
+    db.Column('permission_id', db.Integer, db.ForeignKey('permission.id')),
+    db.Column('user_id', db.Integer, db.ForeignKey('user.id'))
+)
+
 class User(db.Model, UserMixin):
     'A person who logs into the system and has certain privileges'
 
@@ -49,13 +54,66 @@ class User(db.Model, UserMixin):
 
         return user, authenticated
 
-    # Privileges
-    can_edit_items = db.Column(db.Boolean)
-    can_perform_action = db.Column(db.Boolean)
-    can_edit_people = db.Column(db.Boolean)
-    can_edit_events = db.Column(db.Boolean)
-    can_edit_locations = db.Column(db.Boolean)
-    can_edit_teams = db.Column(db.Boolean)
+    permissions = db.relationship('Permission', secondary=user_permissions, lazy='dynamic', backref=db.backref('users', lazy='dynamic'))
+
+    def has_permission(self, name):
+        'Check out whether a user has a permission or not.'
+
+        permission = Permission.query.filter_by(name=name).first()
+        # if the permission does not exist or was not given to the user
+        if not permission or not permission in self.permissions:
+            return False
+        return True
+
+    def grant_permission(self, name):
+        'Grant a permission to a user.'
+        permission = Permission.query.filter_by(name=name).first()
+        if permission and permission in self.permissions:
+            return
+        elif not permission:
+            raise ValueError('%s is not a valid permission type' % name)
+        self.permissions.append(permission)
+
+    def revoke_permission(self, name):
+        'Revoke a given permission for a user.'
+        permission = Permission.query.filter_by(name=name).first()
+        if not permission or not permission in self.permissions:
+            return
+        self.permissions.remove(permission)
+
+class Permission(db.Model):
+    'Permissions attatched to a user'
+
+    __tablename__ = 'permission'
+
+    id = db.Column(db.Integer, primary_key=True)
+    name = db.Column(db.String(128), nullable=False, index=True, unique=True)
+    description = db.Column(db.String(1024), nullable=False)
+
+def create_permission_types():
+    'Create permission types, should only be called on database initialziation'
+
+    # Add privilege for being able to perform an action associated
+    # with an item such as check in or check out
+    perm_types = [ 
+            ('perform_action', 'Can perform actions such ask checking in or out items') ]
+
+    # Add an add_, edit_ and del_ permission for each of these types
+    # of data
+    add_edit_del_types = { 
+            'item': 'Can %s items',
+            'person': 'Can %s people',
+            'event': 'Can %s events',
+            'location': 'Can %s locations',
+            'team': 'Can %s teams',
+    }
+    for aed_type, desc_template in add_edit_del_types.items():
+        for prefix in ('add', 'edit', 'delete'):
+            perm_types.append( ('%s_%s' % (prefix, aed_type), desc_template % prefix) )
+
+    for ptype, pdesc in perm_types:
+        db.session.add(Permission(name=ptype, description=pdesc))
+    db.session.commit()
 
 # Login Manager callbacks
 
