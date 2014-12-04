@@ -26,6 +26,17 @@
         <script src="{{ url_for('static', filename='js/knockout-3.2.0.js') }}"></script>
         <script src="{{ url_for('static', filename='js/select2.min.js') }}"></script>
         <script src="{{ url_for('static', filename='js/ko_select2.js') }}"></script>
+
+        <script type="text/javascript">
+            var login_uri = "{{ url_for('login') }}";
+            var items_uri = "{{ url_for('items_list') }}";
+            var people_uri = "{{ url_for('people_list') }}";
+            var status_def_uri = "{{ url_for('status_def') }}";
+            var actions_uri = "{{ url_for('actions_list') }}";
+        </script>
+
+        <script src="{{ url_for('static', filename='js/util.js') }}"></script>
+        <script src="{{ url_for('static', filename='js/auth.js') }}"></script>
         {% block additional_js %}{% endblock %}
     </body>
 </html>

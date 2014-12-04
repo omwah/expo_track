@@ -1,0 +1,23 @@
+{% extends "layout.html" %}
+
+{% block title %}Expo Track Administration{% endblock %}
+
+{% block additional_js %}
+    <script src="{{ url_for('static', filename='js/admin.js') }}"></script>
+{% endblock %}
+
+{% block body %}
+    <div class="row">
+        <div class="col-sm-3 col-md-2 sidebar">
+            <ul class="nav nav-sidebar">
+                <li class="active"><a href="#">Overview</a></li>
+                <li><a href="#">Items</a></li>
+                <li><a href="#">People</a></li>
+                <li><a href="#">Events</a></li>
+                <li><a href="#">Teams</a></li>
+                <li><a href="#">Locations</a></li>
+          </ul>
+        </div>
+    </div>
+{% endblock %}
+
