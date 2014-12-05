@@ -1,0 +1,13 @@
+{# This template is intended to be included in other templates #}
+<table class="table table-striped">
+    <thead>
+        <tr><th>Tracking No.</th><th>Name</th><th>Status</th></tr>
+    </thead>
+    <tbody data-bind="foreach: items().data_elements">
+        <tr>
+            <td data-bind="text: tracking_number"></td>
+            <td data-bind="text: name"></td>
+            <td data-bind="text: status"></td>
+        </tr>    
+    </tbody>
+</table>

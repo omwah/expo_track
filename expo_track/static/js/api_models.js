@@ -6,7 +6,7 @@ function ItemModel(data) {
     self.id = ko.observable(data.id);
     self.name = ko.observable(data.name);
     self.description = ko.observable(data.description);
-    self.status = ko.observable(data.status)
+    self.status = ko.observable(data.status.name);
     self.tracking_number = ko.observable(data.tracking_number);
     // owner 
     self.uri = ko.observable(data.uri);

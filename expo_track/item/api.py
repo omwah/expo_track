@@ -11,20 +11,20 @@ from constants import STATUS_TYPES, STATUS_OPPOSITES
 
 from ..person.api import person_fields
 
+class StatusField(fields.Raw):
+    def format(self, value):
+        return { 'code': value, 'name': STATUS_TYPES.get(value, None) }
+
 item_fields = {
     'id': fields.String,
     'name': fields.String,
     'description': fields.String,
-    'status': fields.String,
+    'status': StatusField,
     'tracking_number': fields.String,
     'owner': fields.Nested({ 'name': fields.String,
                              'uri': SafeUrlField('team') }),
     'uri': SafeUrlField('item'),
 }
-
-class StatusField(fields.Raw):
-    def format(self, value):
-        return { 'code': value, 'name': STATUS_TYPES.get(value, None) }
 
 action_fields = {
     'id': fields.String,

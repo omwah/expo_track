@@ -9,7 +9,7 @@
 {% block body %}
     {% include "user/login.html" %}
     <div data-bind="visible: auth().authenticated" class="row">
-        <div class="col-sm-3 col-md-2 sidebar">
+        <div class="col-md-2 sidebar">
             <ul class="nav nav-sidebar">
                 <li class="active"><a href="#">Overview</a></li>
                 <li><a href="#">Items</a></li>
@@ -18,6 +18,10 @@
                 <li><a href="#">Teams</a></li>
                 <li><a href="#">Locations</a></li>
           </ul>
+        </div>
+
+        <div class="col-md-10">
+            {% include "item/edit_items.html" %}
         </div>
     </div>
 {% endblock %}
