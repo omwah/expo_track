@@ -7,7 +7,7 @@ from ..utils import SafeUrlField
 from ..user.decorators import has_permission
 
 from models import Item, Action
-from constants import STATUS_TYPES, STATUS_OPPOSITES
+from constants import STATUS_TYPES, STATUS_OPPOSITES, STATUS_CHECK_IN
 
 from ..person.api import person_fields
 
@@ -43,13 +43,13 @@ action_fields = {
 }
 
 class ItemListResource(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('status', type=int)
 
     @login_required
     @marshal_with(item_fields)
     def get(self):
-        args = self.parser.parse_args()
+        parser = reqparse.RequestParser()
+        parser.add_argument('status', type=int)
+        args = parser.parse_args()
 
         items_query = Item.query
 
@@ -58,7 +58,26 @@ class ItemListResource(Resource):
 
         return items_query.all()
 
+    @login_required
+    @has_permission('add_item')
+    @marshal_with(item_fields)
+    def post(self):
+        parser = reqparse.RequestParser()
+        parser.add_argument('name', type=str, required=True)
+        parser.add_argument('tracking_number', type=str, required=True)
+        args = parser.parse_args()
+
+        item = Item(name=args.name, tracking_number=args.tracking_number, status=STATUS_CHECK_IN)
+
+        db.session.add(item)
+        db.session.commit()
+
+        return item
+
 class ItemResource(Resource):
+    parser = reqparse.RequestParser()
+    parser.add_argument('name', type=str, required=True)
+    parser.add_argument('tracking_number', type=str, required=True)
 
     @login_required
     @marshal_with(item_fields)
@@ -66,25 +85,37 @@ class ItemResource(Resource):
         return Item.query.filter(Item.id == id).first_or_404()
 
     @login_required
-    @has_permission('add_item')
-    def post(self):
-        pass
-
-    @login_required
     @has_permission('edit_item')
+    @marshal_with(item_fields)
     def put(self, id):
-        pass
+        args = self.parser.parse_args()
+
+        item = Item.query.filter(Item.id == id).first_or_404()
+        
+        item.name = args.name
+        item.tracking_number = args.tracking_number
+
+        db.session.commit()
+
+        return item
 
     @login_required
     @has_permission('delete_item')
     def delete(self, id):
-        pass
+        item = Item.query.filter(Item.id == id).first_or_404()
+
+        db.session.delete(item);
+        db.session.commit();
+
+        return { 'delete': True }
 
 class ActionListResource(Resource):
 
     @login_required
     @marshal_with(action_fields)
     def get(self):
+        # These are seperate from post() so they are not all required
+        # as they just define ways to search for items
         parser = reqparse.RequestParser()
         parser.add_argument('item_id', type=int)
         parser.add_argument('status', type=int)
@@ -136,12 +167,6 @@ class ActionListResource(Resource):
         return new_action
 
 class ActionResource(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('status', type=int, required=True)
-    parser.add_argument('note', type=str)
-    parser.add_argument('person_id', type=int, required=True)
-    parser.add_argument('event_id', type=int, required=True)
-    parser.add_argument('location_id', type=int)
 
     @login_required
     @marshal_with(action_fields)

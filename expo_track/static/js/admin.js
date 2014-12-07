@@ -3,42 +3,37 @@
 // ----------
 
 // Generic interface for communicating with server 
-function ApiElementModel(model_type, uri) {
+function ApiElementModel(model_type, data) {
     var self = this;
 
     self.model_type = model_type;
-    self.model = ko.observable(new self.model_type());
-    self.uri = uri;
+    if (data) {
+        self.model = ko.observable(new self.model_type(data));
+        self.uri = data.uri;
+    } else {
+        self.model = ko.observable(new self.model_type());
+        self.uri = null;
+    }
 
     // Get data for element from the server
     // Generally just need self.model.id defined
-    self.get = function(send_data) {
-        json_request(self.uri, "GET", send_data).done(function(ret_data) {
-            self.model(new self.model_type(ret_data));
-        });
-    }
-
-    // Create a new element on the server
-    self.create = function() {
-        json_request(self.uri, "POST", self.model).done(function(ret_data) {
-            self.model(new self.model_type(ret_data));
-        });
+    self.load = function(send_data) {
+        if (self.uri) {
+            json_request(self.uri, "GET", send_data).done(function(ret_data) {
+                self.model(new self.model_type(ret_data));
+            });
+        }
     }
 
     // Update data on server from model
     self.update = function() {
-        json_request(self.uri, "PUT", self.model).done(function(ret_data) {
-            self.model(new self.model_type(ret_data));
-        });
+        if (self.uri) {
+            json_request(self.uri, "PUT", self.model).done(function(ret_data) {
+                self.model(new self.model_type(ret_data));
+            });
+        }
     }
 
-    // Delete element from server
-    // Generally just need self.model.id defined
-    self.delete = function() {
-        json_request(self.uri, "DELETE").done(function(ret_data) {
-            self.model(new self.model_type());
-        });
-    }
 }
 
 function ApiListModel(model_type, uri) {
@@ -47,21 +42,71 @@ function ApiListModel(model_type, uri) {
     self.model_type = model_type;
     self.data_elements = ko.observableArray([]);
     self.uri = uri;
+    self.edited_item = ko.observable();
+    self.editing = ko.observable(false);
 
     self.load = function(send_data) {
         json_request(self.uri, "GET", send_data).done(function(ret_data) {
             var mapped_elements = $.map(ret_data, function(element) {
-                return new self.model_type(element);
+                return new ApiElementModel(self.model_type, element);
             });
             self.data_elements(mapped_elements);
         });
     }
-    
+
+    self.begin_edit = function() {
+        self.editing(true);
+        self.edited_item(this);
+    }
+
+    self.begin_new = function() {
+        self.editing(true);
+        self.edited_item(new ApiElementModel(self.model_type));
+    }
+
+    self.finish_edit = function() {
+        self.editing(false);
+        if (self.edited_item().uri) {
+            self.edited_item().update();
+        } else {
+            self.create_new();
+        }
+        self.edited_item(null);
+    }
+     
+    // Create a new element on the server
+    self.create_new = function() {
+        var send_data = self.edited_item().model;
+        json_request(self.uri, "POST", send_data).done(function(ret_data) {
+            self.data_elements.push(new ApiElementModel(self.model_type, ret_data));
+        });
+    }
+
+    // Delete element from server
+    // Generally just need self.model.id defined
+    self.remove = function() {
+        var to_remove = this;
+
+        var confirmed;
+        if (to_remove.model().name) {
+            confirmed = confirm("Are you sure you want to remove: " + to_remove.model().name());
+        } else {
+            confirmed = confirmed("Are you sure you want to remove this element?");
+        }
+
+        if (confirmed) {
+            json_request(to_remove.uri, "DELETE").done(function(ret_data) {
+                self.data_elements.remove(to_remove);
+            });
+        }
+    }
+
     $(document).on("login", function() {
         self.load();
     });
 
     $(document).on("logout", function() {
+        // Clear data
         self.data_elements([]);
     });
 }
