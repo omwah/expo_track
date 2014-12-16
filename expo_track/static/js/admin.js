@@ -36,7 +36,7 @@ function ApiElementModel(model_type, data) {
 
 }
 
-function ApiListModel(model_type, uri) {
+function ApiListModel(model_type, columns, uri) {
     var self = this;
 
     self.model_type = model_type;
@@ -44,6 +44,31 @@ function ApiListModel(model_type, uri) {
     self.uri = uri;
     self.edited_item = ko.observable();
     self.editing = ko.observable(false);
+    self.grid_view_model = new ko.sortableGrid.viewModel({
+        data: self.data_elements,
+        columns: columns,
+        pageSize: 10,
+        beginEdit: function() {
+            self.editing(true);
+            self.edited_item(this);
+        },
+        remove: function() {
+            var to_remove = this;
+
+            var confirmed;
+            if (to_remove.model().name) {
+                confirmed = confirm("Are you sure you want to remove: " + to_remove.model().name());
+            } else {
+                confirmed = confirmed("Are you sure you want to remove this element?");
+            }
+
+            if (confirmed) {
+                json_request(to_remove.uri, "DELETE").done(function(ret_data) {
+                    self.data_elements.remove(to_remove);
+                });
+            }
+        },
+    });
 
     self.load = function(send_data) {
         json_request(self.uri, "GET", send_data).done(function(ret_data) {
@@ -52,11 +77,6 @@ function ApiListModel(model_type, uri) {
             });
             self.data_elements(mapped_elements);
         });
-    }
-
-    self.begin_edit = function() {
-        self.editing(true);
-        self.edited_item(this);
     }
 
     self.begin_new = function() {
@@ -82,25 +102,6 @@ function ApiListModel(model_type, uri) {
         });
     }
 
-    // Delete element from server
-    // Generally just need self.model.id defined
-    self.remove = function() {
-        var to_remove = this;
-
-        var confirmed;
-        if (to_remove.model().name) {
-            confirmed = confirm("Are you sure you want to remove: " + to_remove.model().name());
-        } else {
-            confirmed = confirmed("Are you sure you want to remove this element?");
-        }
-
-        if (confirmed) {
-            json_request(to_remove.uri, "DELETE").done(function(ret_data) {
-                self.data_elements.remove(to_remove);
-            });
-        }
-    }
-
     $(document).on("login", function() {
         self.load();
     });
@@ -115,7 +116,14 @@ function BaseViewModel() {
     var self = this;
 
     self.auth = ko.observable(auth_view_model);
-    self.items = ko.observable(new ApiListModel(ItemModel, items_uri));
+    self.items = ko.observable(new ApiListModel(ItemModel, 
+                [
+                    { headerText: "Tracking No.", rowText: function(row) { return row.model().tracking_number }, isSortable: true, rowClass: "col-md-2" },
+                    { headerText: "Name", rowText: function(row) { return row.model().name }, isSortable: true, rowClass: "col-md-6" },
+                    { headerText: "Status", rowText: function(row) { return row.model().status }, isSortable: true, rowClass: "col-md-3" },
+
+                ],
+                items_uri));
 
 };
 
