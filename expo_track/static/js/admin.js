@@ -59,7 +59,7 @@ function ApiListModel(model_type, columns, uri) {
             if (to_remove.model().name) {
                 confirmed = confirm("Are you sure you want to remove: " + to_remove.model().name());
             } else {
-                confirmed = confirmed("Are you sure you want to remove this element?");
+                confirmed = confirm("Are you sure you want to remove this element?");
             }
 
             if (confirmed) {
@@ -82,6 +82,11 @@ function ApiListModel(model_type, columns, uri) {
     self.begin_new = function() {
         self.editing(true);
         self.edited_item(new ApiElementModel(self.model_type));
+    }
+
+    self.cancel_edit = function() {
+        self.editing(false);
+        self.edited_item(null);
     }
 
     self.finish_edit = function() {
@@ -146,6 +151,16 @@ function BaseViewModel() {
                  ],
                  items_uri));
 
+    self.people = ko.observable(new ApiListModel(PersonModel, 
+                 [
+                   { headerText: "Display Name", 
+                     rowText: function(row) { 
+                         return row.model().display_name }, 
+                     isSortable: true, rowClass: "col-md-10"
+                   },
+                 ],
+                 people_uri));
+ 
 };
 
 var base_view_model = new BaseViewModel();
