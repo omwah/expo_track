@@ -10,19 +10,18 @@
 {% block body %}
     {% include "user/login.html" %}
     <div data-bind="visible: auth().authenticated" class="row">
-        <div class="col-md-2 sidebar">
-            <ul class="nav nav-sidebar">
-                <li class="active"><a href="#">Overview</a></li>
-                <li><a href="#">Items</a></li>
-                <li><a href="#">People</a></li>
-                <li><a href="#">Events</a></li>
-                <li><a href="#">Teams</a></li>
-                <li><a href="#">Locations</a></li>
+        <div class="col-md-2">
+            <ul data-bind="foreach: tabs" class="nav nav-pills nav-stacked">
+                <li data-bind="css: {active: name == $parent.active_tab()}">
+                <a data-bind="click: function() {$parent.active_tab(name)}" href="#"><span data-bind="text: title"></span></a>
+                </li>
           </ul>
         </div>
 
         <div class="col-md-10">
-            {% include "item/edit_items.html" %}
+            <div data-bind="visible: active_tab() === 'items'">
+                {% include "item/edit_items.html" %}
+            </div>
         </div>
     </div>
 {% endblock %}

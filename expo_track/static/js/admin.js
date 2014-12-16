@@ -116,14 +116,35 @@ function BaseViewModel() {
     var self = this;
 
     self.auth = ko.observable(auth_view_model);
-    self.items = ko.observable(new ApiListModel(ItemModel, 
-                [
-                    { headerText: "Tracking No.", rowText: function(row) { return row.model().tracking_number }, isSortable: true, rowClass: "col-md-2" },
-                    { headerText: "Name", rowText: function(row) { return row.model().name }, isSortable: true, rowClass: "col-md-6" },
-                    { headerText: "Status", rowText: function(row) { return row.model().status }, isSortable: true, rowClass: "col-md-3" },
 
-                ],
-                items_uri));
+    self.active_tab = ko.observable("items");
+    self.tabs = ko.observableArray([
+            { name: "items", title: "Items" },
+            { name: "people", title: "People" },
+            { name: "events", title: "Events" },
+            { name: "teams", title: "Teams" },
+            { name: "locations", title: "Loactions" },
+    ]);
+
+    self.items = ko.observable(new ApiListModel(ItemModel, 
+                 [
+                   { headerText: "Tracking No.", 
+                     rowText: function(row) { 
+                         return row.model().tracking_number }, 
+                     isSortable: true, rowClass: "col-md-2"
+                   },
+                   { headerText: "Name",
+                     rowText: function(row) { 
+                         return row.model().name },
+                     isSortable: true, rowClass: "col-md-6",
+                   },
+                   { headerText: "Status",
+                     rowText: function(row) { 
+                         return row.model().status }, 
+                     isSortable: true, rowClass: "col-md-3",
+                   },
+                 ],
+                 items_uri));
 
 };
 
