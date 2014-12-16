@@ -160,6 +160,15 @@ function BaseViewModel() {
                    },
                  ],
                  people_uri));
+
+    // Client-side routes    
+    Sammy(function() {
+        var sammy = this;
+        sammy.get("#:tab", function() {
+            self.active_tab(this.params.tab);
+        });
+        sammy.get('', function() { this.app.runRoute('get', '#' + self.tabs()[0].name) });
+    }).run();
  
 };
 
