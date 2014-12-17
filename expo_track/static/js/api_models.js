@@ -54,6 +54,14 @@ function PersonModel(data) {
     } else {
         self.contacts = ko.observableArray([]);
     }
+
+    self.add_contact = function(data) {
+        self.contacts.push(new ContactModel(data));
+    };
+
+    self.delete_contact = function() {
+        self.contacts.remove(this);
+    };
 }
 
 function UserModel(data) {

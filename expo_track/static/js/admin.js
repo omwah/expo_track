@@ -119,22 +119,6 @@ function ApiListModel(model_type, columns, uri) {
     });
 }
 
-// Extends the PersonModel to make the address, email and phone number
-// data editable tables
-function PersonEditModel(data) {
-    var self = new PersonModel(data);
-
-    self.add_contact = function() {
-        self.contacts.push(new ContactModel());
-    };
-
-    self.delete_contact = function() {
-        self.contacts.remove(this);
-    };
-
-    return self;
-}
-
 function BaseViewModel() {
     var self = this;
 
@@ -169,7 +153,7 @@ function BaseViewModel() {
                  ],
                  items_uri));
 
-    self.people = ko.observable(new ApiListModel(PersonEditModel, 
+    self.people = ko.observable(new ApiListModel(PersonModel, 
                  [
                    { headerText: "Display Name", 
                      rowText: function(row) { 
