@@ -155,13 +155,23 @@ function BaseViewModel() {
 
     self.people = ko.observable(new ApiListModel(PersonModel, 
                  [
-                   { headerText: "Display Name", 
+                   { headerText: "Name", 
                      rowText: function(row) { 
                          return row.model().display_name }, 
                      isSortable: true, rowClass: "col-md-10"
                    },
                  ],
                  people_uri));
+
+    self.events = ko.observable(new ApiListModel(EventModel, 
+                 [
+                   { headerText: "Name", 
+                     rowText: function(row) { 
+                         return row.model().name }, 
+                     isSortable: true, rowClass: "col-md-10"
+                   },
+                 ],
+                 events_uri));
 
     // Client-side routes    
     Sammy(function() {

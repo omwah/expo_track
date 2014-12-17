@@ -25,6 +25,9 @@
             <div data-bind="visible: active_tab() === 'people'">
                 {% include "person/edit_people.html" %}
             </div>
+            <div data-bind="visible: active_tab() === 'events'">
+                {% include "event/edit_events.html" %}
+            </div>
         </div>
     </div>
 {% endblock %}

@@ -64,6 +64,14 @@ function PersonModel(data) {
     };
 }
 
+function EventModel(data) {
+    var self = this;
+
+    var attributes =
+        ["id", "name", "description"];
+    make_api_attributes(self, data, attributes);
+}
+
 function UserModel(data) {
     var self = this;
 

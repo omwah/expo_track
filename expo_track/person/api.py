@@ -78,8 +78,7 @@ class PeopleListResource(Resource):
     @has_permission('add_person')
     @marshal_with(person_fields)
     def post(self):
-        parser = person_parser()
-        args = parser.parse_args()
+        args = person_parser().parse_args()
 
         person = Person(given_name=args.given_name, 
                         family_name=args.family_name)
@@ -93,7 +92,6 @@ class PeopleListResource(Resource):
 
 
 class PersonResource(Resource):
-    parser = person_parser()
 
     @login_required
     @marshal_with(person_fields)
@@ -104,7 +102,7 @@ class PersonResource(Resource):
     @has_permission('edit_person')
     @marshal_with(person_fields)
     def put(self, id):
-        args = self.parser.parse_args()
+        args = person_parser().parse_args()
 
         person = Person.query.filter(Person.id == id).first_or_404()
 
