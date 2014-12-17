@@ -1,23 +1,42 @@
 // Models that should match what the API returns for individual tables
 
+// Adds API class attributes that are just mirrors of
+// the data from the server
+var make_api_attributes = function(self, data, attributes) {
+    for(attr in attributes) {
+        attr_name = attributes[attr];
+        self[attr_name] = ko.observable(data && data[attr_name] ? data[attr_name] : null);
+    }
+}
+
 function ItemModel(data) {
     var self = this;
 
-    self.id = ko.observable(data ? data.id : null);
-    self.name = ko.observable(data ? data.name : null);
-    self.description = ko.observable(data ? data.description : null);
-    self.status = ko.observable(data ? data.status.name : null);
-    self.tracking_number = ko.observable(data ? data.tracking_number : null);
-    // owner 
-    self.uri = ko.observable(data ? data.uri : null);
+    var attributes =
+        ["id", "name", "description", "tracking_number", "uri"];
+    make_api_attributes(self, data, attributes);
+    self.status = ko.observable(data && data.status ? data.status.name : null);
+}
+
+function ContactModel(data) {
+    var self = this;
+
+    var attributes =
+        ["id", "type", "address", "phone_number", "email_address"];
+    make_api_attributes(self, data, attributes);
+
+    if(typeof self.type() === "undefined") {
+        self.type(0);
+    }
 }
 
 function PersonModel(data) {
     var self = this;
-    self.id = ko.observable(data ? data.id : null);
-    self.given_name = ko.observable(data ? data.given_name : null);
-    self.family_name = ko.observable(data ? data.family_name : null);
-    self.uri = ko.observable(data ? data.uri : null);
+
+    make_api_attributes(self, data, ["id", "uri"]);
+
+    self.given_name = ko.observable(data && data.given_name ? data.given_name : null);
+    self.family_name = ko.observable(data && data.family_name ? data.family_name : null);
     self.display_name = ko.computed(function() {
         var given_name = self.given_name();
         var family_name = self.family_name();
@@ -27,6 +46,14 @@ function PersonModel(data) {
             return given_name;
         }
     });
+
+    if(data && data.contacts) {
+        self.contacts = ko.observableArray($.map(data.contacts, function(contact) {
+            return new ContactModel(contact);
+        }));
+    } else {
+        self.contacts = ko.observableArray([]);
+    }
 }
 
 function UserModel(data) {

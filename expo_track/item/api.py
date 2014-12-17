@@ -9,8 +9,6 @@ from ..user.decorators import has_permission
 from models import Item, Action
 from constants import STATUS_TYPES, STATUS_OPPOSITES, STATUS_CHECK_IN
 
-from ..person.api import person_fields
-
 class StatusField(fields.Raw):
     def format(self, value):
         return { 'code': value, 'name': STATUS_TYPES.get(value, None) }
@@ -33,7 +31,9 @@ action_fields = {
     'status': StatusField,
     'date': fields.DateTime(dt_format='rfc822'),
     'note': fields.String,
-    'person': fields.Nested(person_fields),
+    'person': fields.Nested({ 'given_name': fields.String,
+                              'family_name': fields.String,
+                              'uri': SafeUrlField('person') }),
     'event': fields.Nested({ 'name': fields.String,
                              'uri': SafeUrlField('event') }),
     'location': fields.Nested({ 'name': fields.String,
