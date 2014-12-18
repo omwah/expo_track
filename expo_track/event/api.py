@@ -201,7 +201,6 @@ class TeamResource(Resource):
         team.primary_location_id = args.primary_location_id
 
         db.session.commit()
-        db.session.refresh(team)
 
         return team
 

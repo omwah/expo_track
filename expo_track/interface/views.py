@@ -11,7 +11,7 @@ mod = Blueprint('interface', __name__, url_prefix='')
 def index():
     return render_template('interface/index.html', status_types=STATUS_TYPES.items())
 
-@mod.route('/admin')
+@mod.route('/config')
 @login_required
-def admin():
-    return render_template('interface/admin.html', current_user=current_user, contact_types=CONTACT_TYPES.items())
+def config():
+    return render_template('interface/config.html', current_user=current_user, contact_types=CONTACT_TYPES.items())

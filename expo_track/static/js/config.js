@@ -1,6 +1,5 @@
 // ----------
-// Base model
-// ----------
+// Handles the configuration logic for the application
 
 // Generic interface for communicating with server 
 function ApiElementModel(model_type, data) {
@@ -205,11 +204,12 @@ function BaseViewModel() {
 
     // Client-side routes    
     Sammy(function() {
+        // config_base_uri is defined in the html template
         var sammy = this;
-        sammy.get("#:tab", function() {
+        sammy.get(config_base_uri + "#:tab", function() {
             self.active_tab(this.params.tab);
         });
-        sammy.get('', function() { this.app.runRoute('get', '#' + self.tabs()[0].name) });
+        sammy.get(config_base_uri, function() { this.app.runRoute("get", config_base_uri + "#" + self.tabs()[0].name) });
     }).run();
  
 };

@@ -6,7 +6,8 @@
             <div class="container-fluid">
 
                 <div class="navbar-header">
-                    <a class="navbar-brand" href="{{ url_for('interface.index') }}"><span class="glyphicon glyphicon-check"></span></a>
+                    <a class="navbar-text" href="{{ url_for('interface.index') }}"><span class="glyphicon glyphicon-check"></span> Home</a>
+                    <a class="navbar-text" href="{{ url_for('interface.config') }}"><span class="glyphicon glyphicon-cog"></span> Config</a>
                     {% block navbar_header %}{% endblock %}
                 </div>
 
