@@ -129,8 +129,8 @@ function BaseViewModel() {
             { name: "items", title: "Items" },
             { name: "people", title: "People" },
             { name: "events", title: "Events" },
+            { name: "locations", title: "Locations" },
             { name: "teams", title: "Teams" },
-            { name: "locations", title: "Loactions" },
     ]);
 
     self.items = ko.observable(new ApiListModel(ItemModel, 
@@ -172,6 +172,36 @@ function BaseViewModel() {
                    },
                  ],
                  events_uri));
+
+    self.locations = ko.observable(new ApiListModel(LocationModel, 
+                 [
+                   { headerText: "Name", 
+                     rowText: function(row) { 
+                         return row.model().name }, 
+                     isSortable: true, rowClass: "col-md-10"
+                   },
+                 ],
+                 locations_uri));
+
+    self.teams = ko.observable(new ApiListModel(TeamModel, 
+                 [
+                   { headerText: "Name", 
+                     rowText: function(row) { 
+                         return row.model().name }, 
+                     isSortable: true, rowClass: "col-md-5"
+                   },
+                   { headerText: "Primary Location", 
+                     rowText: function(row) { 
+                         return row.model().primary_location().name }, 
+                     isSortable: true, rowClass: "col-md-5"
+                   },
+                 ],
+                 teams_uri));
+
+    //$(document).on("login", function() {
+    //    // Make sure events are always loaded, since locations depends on it
+    //    self['events'].load();
+    //});
 
     // Client-side routes    
     Sammy(function() {

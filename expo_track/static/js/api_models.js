@@ -33,10 +33,8 @@ function ContactModel(data) {
 function PersonModel(data) {
     var self = this;
 
-    make_api_attributes(self, data, ["id", "uri"]);
+    make_api_attributes(self, data, ["id", "given_name", "family_name", "uri"]);
 
-    self.given_name = ko.observable(data && data.given_name ? data.given_name : null);
-    self.family_name = ko.observable(data && data.family_name ? data.family_name : null);
     self.display_name = ko.computed(function() {
         var given_name = self.given_name();
         var family_name = self.family_name();
@@ -68,8 +66,45 @@ function EventModel(data) {
     var self = this;
 
     var attributes =
-        ["id", "name", "description"];
+        ["id", "name", "description", "uri"];
     make_api_attributes(self, data, attributes);
+}
+
+function LocationModel(data) {
+    var self = this;
+
+    var attributes =
+        ["id", "name", "uri"];
+    make_api_attributes(self, data, attributes);
+
+    self.event_id = ko.observable(data && data.event ? data.event.id : null);
+}
+
+function TeamModel(data) {
+    var self = this;
+
+    var attributes =
+        ["id", "name", "uri"];
+    make_api_attributes(self, data, attributes);
+
+    if(data && data.members) {
+        self.members = ko.observableArray($.map(data.members, function(member) {
+            return new PersonModel(member);
+        }));
+    } else {
+        self.members = ko.observableArray([]);
+    }
+
+    if (data && data.primary_location) {
+        self.primary_location = ko.observable(new LocationModel(data.primary_location));
+    } else {
+        self.primary_location = ko.observable(new LocationModel());
+    }
+
+    // This gets pushed to the server on post and put class
+    self.primary_location_id = ko.computed(function() {
+        return self.primary_location().id()
+    });
 }
 
 function UserModel(data) {

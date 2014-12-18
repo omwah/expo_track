@@ -28,6 +28,12 @@
             <div data-bind="visible: active_tab() === 'events'">
                 {% include "event/edit_events.html" %}
             </div>
+            <div data-bind="visible: active_tab() === 'locations'">
+                {% include "event/edit_locations.html" %}
+            </div>
+            <div data-bind="visible: active_tab() === 'teams'">
+                {% include "event/edit_teams.html" %}
+            </div>
         </div>
     </div>
 {% endblock %}

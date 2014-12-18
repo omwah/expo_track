@@ -17,8 +17,6 @@ class Event(db.Model):
 
     logo_filename = db.Column(db.String(1024))
 
-    locations = db.relationship('Location', backref=db.backref('event'))
-
 class Location(db.Model):
     'A location such as a room at an event'
 
@@ -29,6 +27,7 @@ class Location(db.Model):
     name = db.Column(db.String, nullable=False)
 
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
+    event = db.relationship('Event', backref=db.backref('locations', lazy='dynamic'))
 
 class Team(db.Model):
     'A group of people working together at a primary location'
@@ -42,4 +41,4 @@ class Team(db.Model):
     members = db.relationship('Person', secondary=team_members, backref=db.backref('pages', lazy='dynamic'))
 
     primary_location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
-    primary_location = db.relationship('Location', backref=db.backref('teams_housed', lazy='dynamic'))
+    primary_location = db.relationship('Location', backref=db.backref('teams', lazy='dynamic'))
