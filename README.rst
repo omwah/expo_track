@@ -26,14 +26,16 @@ Ensure development server works::
 Installation
 ------------
 
-Install nginx::
+Install nginx (Ubuntu / Debian)::
 
     $ apt-get install nginx uwsgi uwsgi-plugin-python
 
 Install server configs::
 
     rm /etc/nginx/sites-enabled/default
-    cp server/nginx_site /etc/nginx/sites-enabled/expo_track
+    cp server/nginx.conf /etc/nginx/sites-enabled/expo_track
     cp server/uwsgi.ini /etc/uwsgi/apps-enabled/expo_track.ini
+
+Edit the configs you just copied modifying directory variables so they point to the path where you deployed expo_track.
 
 Restart nginx and uwsgi.
