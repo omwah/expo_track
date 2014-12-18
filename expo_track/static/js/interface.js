@@ -66,8 +66,10 @@ function PerformActionModel() {
             json_request(actions_uri, "GET", send_data).done(function(ret_data) {
                 // Only select a person if the person data coming back is not null.
                 // will be null when no person has performed a certain action on an item yet
-                if (ret_data.length > 0 && ret_data[0].person) {
+                if (ret_data.length > 0 && typeof ret_data[0].person !== undefined) {
                     self.selected_person(ret_data[0].person.id);
+                } else {
+                    self.selected_person(undefined);
                 }
             });
         }
