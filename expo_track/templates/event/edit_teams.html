@@ -20,6 +20,25 @@
             </select>
         </div>
 
+        <label>Members</label>
+        <div data-bind="foreach: model().members" class="row">
+            <div class="col-md-5">
+                <p data-bind="text: display_name"></p>
+            </div>
+            <div class="col-md-1">
+                <button data-bind="click: $parents[1].remove_team_member" type="button" class="btn btn-default btn-xs pull-right"><span class="glyphicon glyphicon-remove"></span></button>
+            </div>
+        </div>
+        <p></p>
+        <div class="form-group row">
+            <div class="col-md-1 text-center">
+                <button data-bind="click: $parent.add_team_member" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button>
+            </div>
+            <div class="col-md-11">
+                <select data-bind="options: $root.people().data_elements, optionsValue: function(item) { return $root.people().data_elements.indexOf(item) }, optionsText: function(item) { return item.model().display_name() }, value: $parent.added_member_index, select2: {}" class="form-control" id="team-member-select"></select>
+            </div>
+        </div>
+
         <p>
             <button data-bind="click: $parent.cancel_edit" class="btn btn-default">Cancel</button>
             <button data-bind="click: $parent.finish_edit" class="btn btn-default btn-primary">Apply</button>

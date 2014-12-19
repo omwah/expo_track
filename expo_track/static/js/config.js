@@ -197,6 +197,27 @@ function BaseViewModel() {
                  ],
                  teams_uri));
 
+    // Add an observable to stuff the currently selected person when adding team members
+    self.teams().added_member_index = ko.observable();
+
+    // Add the selected person to a team
+    self.teams().add_team_member = function() {
+        edited_item = this;
+
+        added_index = self.teams().added_member_index();
+        added_person = self.people().data_elements()[added_index].model();
+
+        // Make sure we don't have duplicates
+        if (edited_item.model().members.indexOf(added_person) < 0) {
+            edited_item.model().members.push(added_person);
+        }
+    }
+
+    // Remove a team member
+    self.teams().remove_team_member = function() {
+        self.teams().edited_item().model().members.remove(this);
+    }
+
     //$(document).on("login", function() {
     //    // Make sure events are always loaded, since locations depends on it
     //    self['events'].load();

@@ -6,6 +6,7 @@ from ..utils import SafeUrlField
 from ..user.decorators import has_permission
 
 from models import Event, Location, Team
+from ..person.models import Person
 
 event_fields = {
     'id': fields.String,
@@ -159,7 +160,15 @@ def team_parser():
     parser = reqparse.RequestParser()
     parser.add_argument('name', type=str, required=True)
     parser.add_argument('primary_location_id', type=int, required=True)
+    parser.add_argument('member_ids', type=int, action='append')
     return parser
+
+def add_members(team, member_ids):
+    if member_ids != None:
+        for m_id in member_ids:
+            member = Person.query.filter(Person.id == m_id).first()
+            if member:
+                team.members.append(member)
 
 class TeamListResource(Resource):
 
@@ -176,6 +185,7 @@ class TeamListResource(Resource):
         args = team_parser().parse_args()
 
         team = Team(name=args.name, primary_location_id=args.primary_location_id)
+        add_members(team, args.member_ids)
 
         db.session.add(team)
         db.session.commit()
@@ -199,6 +209,7 @@ class TeamResource(Resource):
 
         team.name = args.name
         team.primary_location_id = args.primary_location_id
+        add_members(team, args.member_ids)
 
         db.session.commit()
 

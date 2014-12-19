@@ -95,6 +95,12 @@ function TeamModel(data) {
         self.members = ko.observableArray([]);
     }
 
+    self.member_ids = ko.computed(function() {
+        return $.map(self.members(), function(element) {
+            return element.id();
+        });
+    });
+
     if (data && data.primary_location) {
         self.primary_location = ko.observable(new LocationModel(data.primary_location));
     } else {
