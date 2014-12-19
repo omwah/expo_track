@@ -4,6 +4,7 @@
 
 {# Include this only for our interface template #}
 {% block additional_js %}
+    <script src="{{ url_for('static', filename='js/jquery-dateFormat.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface.js') }}"></script>
 {% endblock %}
 

@@ -93,6 +93,29 @@ function ActionsModel() {
     self.recent = ko.observableArray([]);
     self.perform = ko.observable(perform_action_model);
 
+    self.grid_view_model = new ko.sortableGrid.viewModel({
+        data: self.recent,
+        columns: [
+            { headerText: "Date", rowText: function(row) {
+                  return $.format.toBrowserTimeZone(row.date());
+              },
+              isSortable: true, rowClass: "col-md-2",
+            },
+            { headerText: "Item", rowText: "item",
+              isSortable: true, rowClass: "col-md-5",
+            },
+            { headerText: "Status", rowText: "status",
+              isSortable: true, rowClass: "col-md-2",
+            },
+            { headerText: "Who", rowText: function (row) {
+                  return row.who().display_name(); 
+              },
+              isSortable: true, rowClass: "col-md-3",
+            },
+        ],
+        pageSize: 10,
+    });
+
     self.load_recent = function() {
         self.recent([]);
         json_request(actions_uri, "GET").done(function(ret_data) {

@@ -31,7 +31,7 @@ action_fields = {
                             'name': fields.String,
                             'uri': SafeUrlField('item') }),
     'status': StatusField,
-    'date': fields.DateTime(dt_format='rfc822'),
+    'date': fields.DateTime(dt_format='iso8601'),
     'note': fields.String,
     'person': fields.Nested({ 'id': fields.String,
                               'given_name': fields.String,

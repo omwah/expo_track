@@ -1,18 +1,4 @@
 {# This template is intended to be included in other templates #}
 <div id="recent-actions-view" data-bind="with: actions, visible: auth().authenticated" class="row">
-    <div class="col-md-12">
-        <table class="table table-striped">
-            <thead>
-                <tr><th>Date</th><th>Item</th><th>Status</th><th>Who</th></tr>
-            </thead>
-            <tbody data-bind="foreach: recent">
-                <tr>
-                    <td data-bind="text: date"></td>
-                    <td data-bind="text: item"></td>
-                    <td data-bind="text: status"></td>
-                    <td data-bind="text: who().display_name"></td>
-                </tr>    
-            </tbody>
-        </table>
-    </div>
+    <div data-bind='sortableGrid: grid_view_model'></div>
 </div>
