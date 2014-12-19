@@ -65,22 +65,38 @@
             this.sortByAsc = function (columnName) {
                 if (typeof columnName === "function") {
                     self.data.sort(function (a, b) {
-                        return columnName(a)() < columnName(b)() ? -1 : 1;
+                        if(typeof columnName(a) == 'function') {
+                            return columnName(a)() < columnName(b)() ? -1 : 1;
+                        } else {
+                            return columnName(a) < columnName(b) ? -1 : 1;
+                        }
                     });
                 } else {
                     self.data.sort(function (a, b) {
-                        return a[columnName] < b[columnName] ? -1 : 1;
+                        if(typeof a[columnName] == 'function') {
+                            return a[columnName]() < b[columnName]() ? -1 : 1;
+                        } else {
+                            return a[columnName] < b[columnName] ? -1 : 1;
+                        }
                     });
                 }
             };
             this.sortByDesc = function (columnName) {
                 if (typeof columnName === "function") {
                     self.data.reverse(function (a, b) {
-                        return columnName(a)() < columnName(b)() ? -1 : 1;
+                        if(typeof columnName(a) == 'function') {
+                            return columnName(a)() < columnName(b)() ? -1 : 1;
+                        } else {
+                            return columnName(a) < columnName(b) ? -1 : 1;
+                        }
                     });
                 } else {
                     self.data.reverse(function (a, b) {
-                        return a[columnName] < b[columnName] ? -1 : 1;
+                        if(typeof a[columnName] == 'function') {
+                            return a[columnName]() < b[columnName]() ? -1 : 1;
+                        } else {
+                            return a[columnName] < b[columnName] ? -1 : 1;
+                        }
                     });
                 }
             };
