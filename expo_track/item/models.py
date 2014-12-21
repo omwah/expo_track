@@ -41,7 +41,7 @@ class Action(db.Model):
 
     # Who performed the action
     person = db.relationship('Person', backref=db.backref('actions', lazy='dynamic'))
-    person_id = db.Column(db.Integer, db.ForeignKey('person.id'), nullable=False)
+    person_id = db.Column(db.Integer, db.ForeignKey('person.id'), nullable=True)
 
     # Which event this event is related to
     event = db.relationship('Event', backref=db.backref('actions', lazy='dynamic'))

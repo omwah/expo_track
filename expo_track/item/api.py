@@ -1,4 +1,4 @@
-from flask.ext.restful import Resource, fields, marshal_with, reqparse
+from flask.ext.restful import Resource, fields, marshal, marshal_with, reqparse
 from flask.ext.login import login_required
 from sqlalchemy.sql.expression import asc, desc
 
@@ -7,7 +7,7 @@ from ..utils import SafeUrlField
 from ..user.decorators import has_permission
 
 from models import Item, Action
-from constants import STATUS_TYPES, STATUS_OPPOSITES, STATUS_CHECK_IN
+from constants import STATUS_TYPES, STATUS_OPPOSITES, STATUS_CHECK_IN, NULL_ACTION_PERSON_NAME
 
 class StatusField(fields.Raw):
     def format(self, value):
@@ -25,6 +25,21 @@ item_fields = {
     'uri': SafeUrlField('item'),
 }
 
+nested_person = fields.Nested({ 'id': fields.String,
+                                'given_name': fields.String,
+                                'family_name': fields.String,
+                                'uri': SafeUrlField('person') })
+
+class ActionPersonField(fields.Raw):
+    'Handles case where person might have been removed gracefully'
+    
+    def output(self, key, obj):
+        if obj.person == None:
+            return { 'given_name': NULL_ACTION_PERSON_NAME,
+                     'family_name': None }
+        else:
+            return nested_person.output(key, obj)
+
 action_fields = {
     'id': fields.String,
     'item': fields.Nested({ 'id': fields.String,
@@ -33,10 +48,7 @@ action_fields = {
     'status': StatusField,
     'date': fields.DateTime(dt_format='iso8601'),
     'note': fields.String,
-    'person': fields.Nested({ 'id': fields.String,
-                              'given_name': fields.String,
-                              'family_name': fields.String,
-                              'uri': SafeUrlField('person') }),
+    'person': ActionPersonField(),
     'event': fields.Nested({ 'id': fields.String,
                              'name': fields.String,
                              'uri': SafeUrlField('event') }),

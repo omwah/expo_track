@@ -5,7 +5,7 @@
 var make_api_attributes = function(self, data, attributes) {
     for(attr in attributes) {
         attr_name = attributes[attr];
-        if (typeof data !== "undefined" && data[attr_name] !== "undefined") {
+        if (typeof data !== "undefined" && data != null && data[attr_name] !== "undefined") {
             self[attr_name] = ko.observable(data[attr_name]);
         } else {
             self[attr_name] = ko.observable(null);
