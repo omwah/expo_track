@@ -5,7 +5,11 @@
 var make_api_attributes = function(self, data, attributes) {
     for(attr in attributes) {
         attr_name = attributes[attr];
-        self[attr_name] = ko.observable(data && data[attr_name] ? data[attr_name] : null);
+        if (typeof data !== "undefined" && data[attr_name] !== "undefined") {
+            self[attr_name] = ko.observable(data[attr_name]);
+        } else {
+            self[attr_name] = ko.observable(null);
+        }
     }
 }
 
@@ -33,7 +37,7 @@ function ContactModel(data) {
 function PersonModel(data) {
     var self = this;
 
-    make_api_attributes(self, data, ["id", "given_name", "family_name", "uri"]);
+    make_api_attributes(self, data, ["id", "given_name", "family_name", "hidden", "uri"]);
 
     self.display_name = ko.computed(function() {
         var given_name = self.given_name();

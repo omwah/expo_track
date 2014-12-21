@@ -157,10 +157,16 @@ function BaseViewModel() {
                    { headerText: "Name", 
                      rowText: function(row) { 
                          return row.model().display_name }, 
-                     isSortable: true, rowClass: "col-md-10"
+                     isSortable: true, rowClass: "col-md-8"
+                   },
+                   { headerText: "Hidden", 
+                     rowText: function(row) { 
+                         return row.model().hidden }, 
+                     isSortable: false, rowClass: "col-md-2"
                    },
                  ],
-                 people_uri));
+                 // For configuration interface show all people
+                 people_uri + "?allow_hidden=True"));
 
     self.events = ko.observable(new ApiListModel(EventModel, 
                  [

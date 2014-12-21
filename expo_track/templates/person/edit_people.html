@@ -7,7 +7,7 @@
 <div data-bind="with: people, visible: people().editing">
     <div data-bind="with: edited_item">
 
-        <h2>Name</h2>
+        <h2>Person</h2>
 
         <div class="form-group">
             <label for="person-given-name">Given Name</label>
@@ -19,7 +19,13 @@
             <input data-bind="value: model().family_name" type="text" class="form-control" id="person-family-name" placeholder="">
         </div>
 
-        <h2>Contact Info</h2>
+        <div class="form-group">
+            <label for="person-hidden">
+                <input data-bind="checked: model().hidden" type="checkbox" id="person-hidden"> Hidden
+            </label>
+        </div>
+ 
+        <label>Contact Info</label>
 
         <div data-bind="foreach: model().contacts" class="row">
             <div class="col-md-6">

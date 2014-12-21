@@ -10,6 +10,8 @@ class Person(db.Model):
     given_name = db.Column(db.String(128), nullable=False)
     family_name = db.Column(db.String(128))
 
+    hidden = db.Column(db.Boolean, default=False)
+
     contacts = db.relationship('Contact', backref=db.backref('person'), cascade='all, delete, delete-orphan')
 
 class Contact(db.Model):

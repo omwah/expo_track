@@ -19,6 +19,7 @@ person_fields = {
     'id': fields.String,
     'given_name': fields.String,
     'family_name': fields.String,
+    'hidden': fields.Boolean,
     'contacts': fields.Nested(contact_fields, allow_null=True),
     'uri': SafeUrlField('person'),
 }
@@ -27,6 +28,7 @@ def person_parser():
     parser = reqparse.RequestParser()
     parser.add_argument('given_name', type=str, required=True)
     parser.add_argument('family_name', type=str, required=True)
+    parser.add_argument('hidden', type=bool, default=False)
     parser.add_argument('contacts', type=dict, action='append')
     return parser
 
@@ -71,7 +73,15 @@ class PeopleListResource(Resource):
     @login_required
     @marshal_with(person_fields)
     def get(self):
-        people = Person.query.all()
+        parser = reqparse.RequestParser()
+        parser.add_argument('allow_hidden', type=bool, default=False)
+        args = parser.parse_args()
+
+        if args.allow_hidden:
+            people = Person.query.all()
+        else:
+            people = Person.query.filter(Person.hidden==False).all()
+
         return people
 
     @login_required
@@ -81,7 +91,8 @@ class PeopleListResource(Resource):
         args = person_parser().parse_args()
 
         person = Person(given_name=args.given_name, 
-                        family_name=args.family_name)
+                        family_name=args.family_name,
+                        hidden=args.hidden)
 
         modify_contacts(person, args.contacts)
 
@@ -108,6 +119,7 @@ class PersonResource(Resource):
 
         person.family_name = args.family_name
         person.given_name = args.given_name
+        person.hidden = args.hidden
 
         modify_contacts(person, args.contacts)
 

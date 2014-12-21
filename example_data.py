@@ -10,7 +10,7 @@ from expo_track.item.constants import *
 from expo_track.person.constants import *
 
 # Administrator account
-admin_person = models.Person(given_name='Admin')
+admin_person = models.Person(given_name='Admin', hidden=True)
 admin_user = models.User(name='admin',
                          password='123456',
                          person=admin_person)
