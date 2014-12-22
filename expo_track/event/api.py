@@ -163,11 +163,19 @@ def team_parser():
     parser.add_argument('member_ids', type=int, action='append')
     return parser
 
-def add_members(team, member_ids):
-    if member_ids != None:
+def edit_members(team, member_ids):
+    if member_ids == None:
+        team.members = []
+    else:
+        # Remove any member not present in member_ids
+        for curr_member in team.members:
+            if not curr_member.id in member_ids:
+                team.members.remove(curr_member)
+
+        # Add any new members
         for m_id in member_ids:
             member = Person.query.filter(Person.id == m_id).first()
-            if member:
+            if member and not member in team.members:
                 team.members.append(member)
 
 class TeamListResource(Resource):
@@ -185,7 +193,7 @@ class TeamListResource(Resource):
         args = team_parser().parse_args()
 
         team = Team(name=args.name, primary_location_id=args.primary_location_id)
-        add_members(team, args.member_ids)
+        edit_members(team, args.member_ids)
 
         db.session.add(team)
         db.session.commit()
@@ -209,7 +217,7 @@ class TeamResource(Resource):
 
         team.name = args.name
         team.primary_location_id = args.primary_location_id
-        add_members(team, args.member_ids)
+        edit_members(team, args.member_ids)
 
         db.session.commit()
 

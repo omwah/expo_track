@@ -38,7 +38,7 @@ class Team(db.Model):
 
     name = db.Column(db.String, nullable=False)
 
-    members = db.relationship('Person', secondary=team_members, backref=db.backref('pages', lazy='dynamic'))
+    members = db.relationship('Person', secondary=team_members, backref=db.backref('pages', lazy='dynamic', single_parent=True))
 
     primary_location_id = db.Column(db.Integer, db.ForeignKey('location.id'))
     primary_location = db.relationship('Location', backref=db.backref('teams', lazy='dynamic'))

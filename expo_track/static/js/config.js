@@ -142,13 +142,19 @@ function TeamApiListModel() {
 
     // Add the selected person to a team
     self.add_team_member = function() {
-        edited_item = this;
+        var edited_item = this;
 
-        added_index = self.added_member_index();
-        added_person = base_view_model.people().data_elements()[added_index].model();
+        var added_index = self.added_member_index();
+        var added_person = base_view_model.people().data_elements()[added_index].model();
 
         // Make sure we don't have duplicates
-        if (edited_item.model().members.indexOf(added_person) < 0) {
+        // Need to search our members because if we are adding
+        // new people after having saved the member list once the added_person
+        // object will be a different one than what is in our members list
+        var has_person = ko.utils.arrayFirst(edited_item.model().members(), function(elem) {
+            return elem.id() === added_person.id();
+        });
+        if (!has_person) {
             edited_item.model().members.push(added_person);
         }
     }
