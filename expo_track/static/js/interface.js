@@ -13,14 +13,49 @@ function ActionItemModel(data) {
     self.uri = ko.observable(data.uri);
 }
 
+function AddPersonModel() {
+    var self = this;
+
+    self.editing = ko.observable(false);
+    self.given_name = ko.observable("");
+    self.family_name = ko.observable("");
+
+    self.begin_add = function() {
+        self.editing(true);
+    }
+
+    self.cancel_add = function() {
+        self.editing(false);
+        self.given_name("");
+        self.family_name("");
+    }
+
+    self.finish_add = function() {
+        self.editing(false);
+
+        send_data = { given_name: self.given_name(), family_name: self.family_name() };
+        json_request(people_uri, "POST", send_data).done(function (ret_data) {
+            added_person = new PersonModel(ret_data);
+            perform_action_model.people.push(added_person);
+            perform_action_model.selected_person(added_person.id());
+
+            self.given_name("");
+            self.family_name("");
+        });
+
+    }
+}
+
 function PerformActionModel() {
     var self = this;
 
     self.selected_status = ko.observable("0");
     self.available_items = ko.observableArray([]);
     self.selected_item = ko.observable();
-    self.people = ko.observable();
+    self.people = ko.observableArray([]);
     self.selected_person = ko.observable();
+
+    self.add_person = ko.observable(new AddPersonModel());
 
     self.load_items = function() {
         // Get the opposite status of the selected status.
@@ -78,8 +113,34 @@ function PerformActionModel() {
         return true;
     }
 
+    self.begin_action = function() {
+        $("#perform-action-modal").modal("show");
+
+        // Load data each time modal is showed so that
+        // it always has fresh data
+        self.load_data();
+    }
+
+    self.finish_action = function() {
+        $("#perform-action-modal").modal("hide");
+
+        // Save changes to server and update recents list
+        action_data = { 'status': self.selected_status(),
+                        'person_id': self.selected_person(),
+                        'item_id': self.selected_item(),
+                        'event_id': 1 }
+        json_request(actions_uri, "POST", action_data).done(function(ret_data) {
+            created_action = new ActionItemModel(ret_data); 
+            actions_model.recent.unshift(created_action);
+        });
+
+    }
+
     // Load data from server for when modal is newly opened
     self.load_data = function() {
+        // If modal was last canceled then cancel any person adding
+        self.add_person().cancel_add(false);
+
         self.load_items();
         self.load_people();
     }
@@ -135,28 +196,6 @@ function ActionsModel() {
         self.recent([]);
     });
 
-    self.begin_action = function() {
-        $("#perform-action-modal").modal("show");
-
-        // Load data each time modal is showed so that
-        // it always has fresh data
-        perform_action_model.load_data();
-    }
-
-    self.finish_action = function() {
-        $("#perform-action-modal").modal("hide");
-
-        // Save changes to server and update recents list
-        action_data = { 'status': self.perform().selected_status(),
-                        'person_id': self.perform().selected_person(),
-                        'item_id': self.perform().selected_item(),
-                        'event_id': 1 }
-        json_request(actions_uri, "POST", action_data).done(function(ret_data) {
-            created_action = new ActionItemModel(ret_data); 
-            self.recent.unshift(created_action);
-        });
-
-    }
 }
 
 var actions_model = new ActionsModel();

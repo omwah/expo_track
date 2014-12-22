@@ -1,19 +1,19 @@
 <div  data-bind="with: actions, visible: auth().authenticated" class="row">
     <div class="col-md-5"></div>
     <div class="col-md-2">
-        <button data-bind="click: begin_action" type="button" class="btn btn-primary btn-lg">Check In/Out</button>
+        <button data-bind="click: perform().begin_action" type="button" class="btn btn-primary btn-lg">Check In/Out</button>
     </div>
     <div class="col-md-5"></div>
 </div>
 
 <div id="perform-action-modal" class="modal">
     <div class="modal-dialog">
-        <div class="modal-content">
+        <div data-bind="with: actions().perform" class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal"><span aria-hidden="true">&times;</span><span class="sr-only">Close</span></button>
                 <h4 class="modal-title">Item Action</h4>
             </div>
-            <div data-bind="with: actions().perform" class="modal-body">
+            <div class="modal-body">
                 
                 <div class="row">
                     <div class="col-md-12">
@@ -51,12 +51,52 @@
                         <select data-bind="options: people, optionsText: 'display_name', optionsValue: 'id', value: selected_person, select2: {}" id="who-select" class="form-control"></select> 
                     </div>
                 </div>
-            </div>
+
+                <div data-bind="with: add_person">
+
+                    <div data-bind="visible: editing() === false" class="row">
+                        <div class="col-md-12 text-right">
+                            <a data-bind="click: begin_add" href="#">Add Person</a>
+                        </div>
+                    </div>
+
+                    <div data-bind="visible: editing">
+                        <hr>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label for="add-person-given">Given Name</label>
+                            </div>
+                            <div class="col-md-6">
+                                <label for="add-person-family">Family Name</label>
+                            </div>
+                        </div>
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <input data-bind="value: given_name" type="text" class="form-control" id="add-person-given" placeholder="">
+                            </div>
+
+                            <div class="col-md-6">
+                                <input data-bind="value: family_name" type="text" class="form-control" id="add-person-family" placeholder="">
+                            </div>
+
+                            <div class="col-md-12">
+                                <p></p>
+                                <button data-bind="click: cancel_add" class="btn btn-default">Cancel</button>
+                                <button data-bind="click: finish_add" class="btn btn-default btn-primary">Apply</button>
+                            </div>
+                        </div>
+                    </div>
+
+                </div> <!-- add_person -->
+
+            </div> <!-- modal-body -->
 
             <div class="modal-footer">
-                <button type="button" class="btn btn-default" data-dismiss="modal">Close</button>
-                <button data-bind="click: actions().finish_action" type="button" class="btn btn-primary">Apply</button>
+                <button type="button" class="btn btn-default" data-dismiss="modal">Cancel</button>
+                <button data-bind="click: finish_action" type="button" class="btn btn-primary">Add</button>
             </div>
-        </div>
-    </div>
-</div>
+        </div> <!-- modal-content -->
+    </div> <!-- modal-dialog -->
+</div> <!-- modal -->
