@@ -118,6 +118,49 @@ function ApiListModel(model_type, columns, uri) {
     });
 }
 
+function TeamApiListModel() {
+    // Extends ApiListModel with mechanisms for the Team interface
+    var self = new ApiListModel(TeamModel, 
+        [
+          { headerText: "Name", 
+            rowText: function(row) { 
+                return row.model().name;
+            }, 
+            isSortable: true, rowClass: "col-md-5"
+          },
+          { headerText: "Primary Location", 
+            rowText: function(row) { 
+                return row.model().primary_location().name;
+            }, 
+            isSortable: true, rowClass: "col-md-5"
+          },
+        ],
+        teams_uri);
+
+    // Add an observable to stuff the currently selected person when adding team members
+    self.added_member_index = ko.observable();
+
+    // Add the selected person to a team
+    self.add_team_member = function() {
+        edited_item = this;
+
+        added_index = self.added_member_index();
+        added_person = base_view_model.people().data_elements()[added_index].model();
+
+        // Make sure we don't have duplicates
+        if (edited_item.model().members.indexOf(added_person) < 0) {
+            edited_item.model().members.push(added_person);
+        }
+    }
+
+    // Remove a team member
+    self.remove_team_member = function() {
+        self.edited_item().model().members.remove(this);
+    }
+
+    return self;
+}
+
 function BaseViewModel() {
     var self = this;
 
@@ -188,46 +231,7 @@ function BaseViewModel() {
                  ],
                  locations_uri));
 
-    self.teams = ko.observable(new ApiListModel(TeamModel, 
-                 [
-                   { headerText: "Name", 
-                     rowText: function(row) { 
-                         return row.model().name }, 
-                     isSortable: true, rowClass: "col-md-5"
-                   },
-                   { headerText: "Primary Location", 
-                     rowText: function(row) { 
-                         return row.model().primary_location().name }, 
-                     isSortable: true, rowClass: "col-md-5"
-                   },
-                 ],
-                 teams_uri));
-
-    // Add an observable to stuff the currently selected person when adding team members
-    self.teams().added_member_index = ko.observable();
-
-    // Add the selected person to a team
-    self.teams().add_team_member = function() {
-        edited_item = this;
-
-        added_index = self.teams().added_member_index();
-        added_person = self.people().data_elements()[added_index].model();
-
-        // Make sure we don't have duplicates
-        if (edited_item.model().members.indexOf(added_person) < 0) {
-            edited_item.model().members.push(added_person);
-        }
-    }
-
-    // Remove a team member
-    self.teams().remove_team_member = function() {
-        self.teams().edited_item().model().members.remove(this);
-    }
-
-    //$(document).on("login", function() {
-    //    // Make sure events are always loaded, since locations depends on it
-    //    self['events'].load();
-    //});
+    self.teams = ko.observable(new TeamApiListModel());
 
     // Client-side routes    
     Sammy(function() {
