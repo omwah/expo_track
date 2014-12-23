@@ -16,7 +16,7 @@
 
         <div class="form-group">
             <label>Primary Location</label>
-            <select data-bind="options: $parent.locations(), optionsValue: function(item) { return item ? item.model().id() : null }, optionsText: function(item) { return item ? item.model().name() : null }, value: model().primary_location().id" class="form-control">
+            <select data-bind="options: $parent.locations(), optionsValue: function(item) { return item ? item.model().id() : null }, optionsText: function(item) { return item ? item.model().name() : null }, value: $parent.editing_location_id" class="form-control">
             </select>
         </div>
 

@@ -113,7 +113,11 @@ function TeamModel(data) {
 
     // This gets pushed to the server on post and put class
     self.primary_location_id = ko.computed(function() {
-        return self.primary_location().id()
+        if (self.primary_location()) {
+            return self.primary_location().id()
+        } else {
+            return null;
+        }
     });
 }
 

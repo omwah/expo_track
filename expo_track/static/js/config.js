@@ -130,7 +130,11 @@ function TeamApiListModel() {
           },
           { headerText: "Primary Location", 
             rowText: function(row) { 
-                return row.model().primary_location().name;
+                if (row.model().primary_location() !== null) {
+                    return row.model().primary_location().name;
+                } else {
+                    return "";
+                }
             }, 
             isSortable: true, rowClass: "col-md-5"
           },
@@ -151,6 +155,35 @@ function TeamApiListModel() {
         locations.unshift(null);
         return locations;
     }
+    
+    // id of the currently editing model
+    self.editing_location_id = ko.observable();
+
+    self.edited_item.subscribe(function (edited_item) {
+        // Update the current location id for the options box from
+        // the data model
+        if (edited_item) {
+            self.editing_location_id(edited_item.model().primary_location().id());
+        }
+    });
+
+    self.editing_location_id.subscribe(function(updated_location_id) {
+        // To keep the model consistent, update the primary location object
+        // with the correct location object
+        if(updated_location_id != self.edited_item().model().primary_location().id()) {
+            var new_location;
+            if (updated_location_id !== null) {
+                new_location = ko.utils.arrayFirst(self.locations(), function(elem) {
+                    if (elem && elem.model().id() == updated_location_id) {
+                        return true;
+                    }
+                }).model();
+            } else {
+                new_location = null;
+            }
+            self.edited_item().model().primary_location(new_location)
+        }
+    });
 
     // Add an observable to stuff the currently selected person when adding team members
     self.added_member_index = ko.observable();
