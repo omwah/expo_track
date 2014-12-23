@@ -137,6 +137,21 @@ function TeamApiListModel() {
         ],
         teams_uri);
 
+    self.locations = function() {
+        // Locations for teams that includes a null at the beginning
+        //
+        // Define as a function so it only gets called when the Primary Locations
+        // select box gets rendered.
+        
+        // Copy array into a new one we can modify, using the same objects
+        var locations = base_view_model.locations().data_elements().slice(0);
+
+        // Add a null item at the beginning which can be selected if there
+        // is no associated location
+        locations.unshift(null);
+        return locations;
+    }
+
     // Add an observable to stuff the currently selected person when adding team members
     self.added_member_index = ko.observable();
 

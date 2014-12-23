@@ -156,10 +156,17 @@ class LocationResource(Resource):
 
         return { 'delete': True }
 
+# Allow primary_location_id to be either an integer or None
+def int_or_none(value):
+    if value == None:
+        return None
+    else:
+        return int(value)
+
 def team_parser():
     parser = reqparse.RequestParser()
     parser.add_argument('name', type=str, required=True)
-    parser.add_argument('primary_location_id', type=int, required=True)
+    parser.add_argument('primary_location_id', type=int_or_none)
     parser.add_argument('member_ids', type=int, action='append')
     return parser
 
@@ -212,6 +219,7 @@ class TeamResource(Resource):
     @marshal_with(team_fields)
     def put(self, id):
         args = team_parser().parse_args()
+        print args
         
         team = Team.query.filter(Team.id == id).first_or_404()
 
