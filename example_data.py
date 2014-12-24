@@ -1,18 +1,25 @@
 # To Use:
-# 1. Install IPython
-# 2. $ python manage.py shell
-# 3. %run -i example_data.py
+# python example_data.py
 
+import argparse
 import random
 from datetime import datetime, timedelta
+
+from expo_track import app, db, models
 
 from expo_track.item.constants import *
 from expo_track.person.constants import *
 
+# Parse command line
+parser = argparse.ArgumentParser(description='Load example data')
+parser.add_argument('--admin_password', type=str, default="123456")
+parser.add_argument('--test_user_password', type=str, default="test_user")
+args = parser.parse_args()
+
 # Administrator account
 admin_person = models.Person(given_name='Admin', hidden=True)
 admin_user = models.User(name='admin',
-                         password='123456',
+                         password=args.admin_password,
                          person=admin_person)
 db.session.add(admin_user)
 
@@ -21,6 +28,19 @@ perm_names = [ p.name for p in models.Permission.query.all() ]
 for pname in perm_names:
     admin_user.grant_permission(pname)
 
+# Test user with less permissions
+test_person = models.Person(given_name='Test User', hidden=True)
+test_user = models.User(name='test_user', 
+                        password=args.test_user_password,
+                        person=test_person)
+
+for perm in [ 'perform_action', 'add_item', 'delete_item', 'edit_item', 
+    'add_person', 'delete_person', 'edit_person' ]:
+    test_user.grant_permission(perm)
+
+db.session.add(test_user)
+
+# Add an event
 linux_expo = models.Event(name="Southern California Linux Expo",
                           description="SCALE's mission is to provide educational opportunities on the topic of Open Source software. Open Source software is any software that meets the litmus test of the OSI (Open Source Initiative)")
 db.session.add(linux_expo)
