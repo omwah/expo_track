@@ -19,6 +19,14 @@ Install requirements::
 
     $ pip install -r requirements.txt
 
+Initialize database::
+
+    $ python manage.py initdb
+
+Load example data::
+
+    $ python example_data.py
+
 Ensure development server works::
 
     $ python manage.py runserver
