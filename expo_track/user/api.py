@@ -40,20 +40,20 @@ class PermissionField(fields.Raw):
     def format(self, value):
         return [ p.name for p in value ]
 
-user_fields = {
+profile_fields = {
     'name': fields.String,
     'person': fields.Nested(person_fields),
     'permissions': PermissionField,
 }
 
-class UserResource(Resource):
+class ProfileResource(Resource):
+    'Information for current_user about theirself'
 
     @login_required
-    @marshal_with(user_fields)
+    @marshal_with(profile_fields)
     def get(self):
         return current_user
 
-
 def register_api(api):
     api.add_resource(LoginResource, '/api/login', endpoint='login')
-    api.add_resource(UserResource, '/api/user', endpoint='user')
+    api.add_resource(ProfileResource, '/api/profile', endpoint='profile')
