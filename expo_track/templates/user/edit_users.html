@@ -1,0 +1,52 @@
+{# This template is intended to be included in other templates #}
+<div data-bind="with: users, visible: users().editing() === false">
+    <h1>Users <button data-bind="click: begin_new" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button></h1>
+    <div data-bind='sortableGrid: grid_view_model'> </div>
+</div>
+
+<div data-bind="with: users, visible: users().editing">
+    <div data-bind="with: edited_item">
+
+        <h2>User</h2>
+
+        <div class="form-group">
+            <label for="user-name">Name</label>
+            <input data-bind="value: model().name" type="text" class="form-control" id="user-name" placeholder=""></input>
+        </div>
+
+        <div class="form-group">
+            <label for="user-password">Password</label>
+            <input data-bind="value: model().password" type="text" class="form-control" id="user-password" placeholder=""></input>
+        </div>
+
+        <div class="form-group">
+            <label>Person</label>
+            <select data-bind="options: $root.people().data_elements, optionsValue: function(item) { return item.model().id() }, optionsText: function(item) { return item.model().display_name() }, value: $parent.editing_person_id" class="form-control">
+            </select>
+        </div>
+
+        <label>Permissions</label>
+        <div data-bind="" class="row">
+            <div class="col-md-12 text-center">
+                <div class="checkbox"><label>
+                    <input data-bind="click: $parent.check_all_permissions" type="checkbox">
+                    Check all
+                </label></div>
+            </div>
+        {% for perm_type in permissions %}
+            <div class="col-md-3">
+                <div class="checkbox"><label>
+                    <input data-bind="checked: model().permissions" type="checkbox" value="{{ perm_type }}">
+                    {{ perm_type }}
+                </label></div>
+            </div>
+        {% endfor %}
+        </div>
+
+        <p>
+            <button data-bind="click: $parent.cancel_edit" class="btn btn-default">Cancel</button>
+            <button data-bind="click: $parent.finish_edit" class="btn btn-default btn-primary">Apply</button>
+        </p>
+
+    </div>
+</div>
