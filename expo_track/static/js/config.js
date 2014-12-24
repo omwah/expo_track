@@ -181,7 +181,7 @@ function TeamApiListModel() {
             } else {
                 new_location = null;
             }
-            self.edited_item().model().primary_location(new_location)
+            self.edited_item().model().primary_location(new_location);
         }
     });
 
@@ -215,6 +215,67 @@ function TeamApiListModel() {
     return self;
 }
 
+function UserApiListModel() {
+    var self = new ApiListModel(UserModel, 
+        [ { headerText: "User Name", 
+            rowText: function(row) { 
+                return row.model().name;
+            }, 
+            isSortable: true, rowClass: "col-md-5"
+          },
+          { headerText: "Person", 
+            rowText: function(row) { 
+                return row.model().person().display_name;
+            }, 
+            isSortable: true, rowClass: "col-md-5"
+          },
+        ],
+        users_uri);
+
+    // Handle linking drop down of person linked to user and the model
+    self.editing_person_id = ko.observable();
+
+    self.edited_item.subscribe(function (edited_item) {
+        if (edited_item) {
+            self.editing_person_id(edited_item.model().person().id());
+        }
+    });
+
+    self.editing_person_id.subscribe(function(updated_person_id) {
+        if(updated_person_id != null) {
+            new_person = ko.utils.arrayFirst(base_view_model.people().data_elements(), function(elem) {
+                if (elem && elem.model().id() == updated_person_id) {
+                    return true;
+                }
+            }).model();
+
+            self.edited_item().model().person(new_person);
+        }
+    });
+
+    self.check_all_permissions = function(data, event) {
+        // Check all permissions on or off according to source checkbox
+        var model_permissions = self.edited_item().model().permissions;
+        checked = event.target.checked;
+
+        if (checked) {
+            // Get name of permissions from the other checkboxes
+            var checkboxes = $(event.target).closest("div.row").find(":checkbox");
+            ko.utils.arrayForEach(checkboxes, function(item) {
+                perm_type = $(item).attr("value");
+                if (perm_type && model_permissions().indexOf(perm_type) < 0) {
+                    model_permissions.push(perm_type);
+                }
+            });
+        } else {
+            model_permissions([]);
+        }
+        return true;
+    };
+
+    return self;
+}
+
 function BaseViewModel() {
     var self = this;
 
@@ -227,6 +288,7 @@ function BaseViewModel() {
             { name: "events", title: "Events" },
             { name: "locations", title: "Locations" },
             { name: "teams", title: "Teams" },
+            { name: "users", title: "Users" },
     ]);
 
     self.items = ko.observable(new ApiListModel(ItemModel, 
@@ -286,6 +348,8 @@ function BaseViewModel() {
                  locations_uri));
 
     self.teams = ko.observable(new TeamApiListModel());
+    
+    self.users = ko.observable(new UserApiListModel());
 
     // Client-side routes    
     Sammy(function() {

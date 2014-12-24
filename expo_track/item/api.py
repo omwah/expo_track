@@ -8,6 +8,7 @@ from ..user.decorators import has_permission
 
 from models import Item, Action
 from constants import STATUS_TYPES, STATUS_OPPOSITES, STATUS_CHECK_IN, NULL_ACTION_PERSON_NAME
+from ..person.api import nested_person_fields
 
 class StatusField(fields.Raw):
     def format(self, value):
@@ -25,10 +26,7 @@ item_fields = {
     'uri': SafeUrlField('item'),
 }
 
-nested_person = fields.Nested({ 'id': fields.String,
-                                'given_name': fields.String,
-                                'family_name': fields.String,
-                                'uri': SafeUrlField('person') })
+nested_person = fields.Nested(nested_person_fields)
 
 class ActionPersonField(fields.Raw):
     'Handles case where person might have been removed gracefully'

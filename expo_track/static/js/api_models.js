@@ -124,7 +124,25 @@ function TeamModel(data) {
 function UserModel(data) {
     var self = this;
 
-    self.name = ko.observable(data.name);
-    self.person = ko.obervable(new PersonModel(data));
-    self.permissions = ko.observableArray(data.permissions);
+   var attributes =
+        ["id", "name", "uri"];
+    make_api_attributes(self, data, attributes);
+
+    self.password = ko.observable(null);
+
+    if(data && data.person) {
+        self.person = ko.observable(new PersonModel(data.person));
+    } else {
+        self.person = ko.observable(new PersonModel());
+    }
+
+    self.person_id = ko.computed(function() {
+        return self.person().id();
+    });
+
+    if (data && data.permissions) {
+        self.permissions = ko.observableArray(data.permissions);
+    } else {
+        self.permissions = ko.observableArray([]);
+    }
 }

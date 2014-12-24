@@ -106,10 +106,15 @@ def create_permission_types():
             'event': 'Can %s events',
             'location': 'Can %s locations',
             'team': 'Can %s teams',
+            'user': 'Can %s users',
     }
     for aed_type, desc_template in add_edit_del_types.items():
         for prefix in ('add', 'edit', 'delete'):
             perm_types.append( ('%s_%s' % (prefix, aed_type), desc_template % prefix) )
+
+    # Users have additional view permission as you don't want everyone and
+    # their buddy knowing who the other users are
+    perm_types.append( ('view_user', 'Can view users') )
 
     for ptype, pdesc in perm_types:
         db.session.add(Permission(name=ptype, description=pdesc))

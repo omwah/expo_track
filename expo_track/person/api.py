@@ -24,6 +24,15 @@ person_fields = {
     'uri': SafeUrlField('person'),
 }
 
+# For use elsewhere to get a smaller amount of data to be included
+# in other fields
+nested_person_fields = {
+    'id': fields.String,
+    'given_name': fields.String,
+    'family_name': fields.String,
+    'uri': SafeUrlField('person')
+}
+
 def person_parser():
     parser = reqparse.RequestParser()
     parser.add_argument('given_name', type=str, required=True)
