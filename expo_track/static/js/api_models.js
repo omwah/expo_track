@@ -19,6 +19,9 @@ function ItemModel(data) {
     var attributes =
         ["id", "name", "description", "tracking_number", "uri"];
     make_api_attributes(self, data, attributes);
+
+    self.name.extend({required: true});
+
     self.status = ko.observable(data && data.status ? data.status.name : null);
 }
 
@@ -38,6 +41,8 @@ function PersonModel(data) {
     var self = this;
 
     make_api_attributes(self, data, ["id", "given_name", "family_name", "hidden", "uri"]);
+
+    self.given_name.extend({required: true});
 
     self.display_name = ko.computed(function() {
         var given_name = self.given_name();
@@ -72,6 +77,8 @@ function EventModel(data) {
     var attributes =
         ["id", "name", "description", "uri"];
     make_api_attributes(self, data, attributes);
+
+    self.name.extend({required: true});
 }
 
 function LocationModel(data) {
@@ -80,6 +87,8 @@ function LocationModel(data) {
     var attributes =
         ["id", "name", "uri"];
     make_api_attributes(self, data, attributes);
+
+    self.name.extend({required: true});
 
     self.event_id = ko.observable(data && data.event ? data.event.id : null);
 }
@@ -90,6 +99,8 @@ function TeamModel(data) {
     var attributes =
         ["id", "name", "uri"];
     make_api_attributes(self, data, attributes);
+
+    self.name.extend({required: true});
 
     if(data && data.members) {
         self.members = ko.observableArray($.map(data.members, function(member) {
@@ -127,6 +138,8 @@ function UserModel(data) {
    var attributes =
         ["id", "name", "uri"];
     make_api_attributes(self, data, attributes);
+
+    self.name.extend({required: true});
 
     self.password = ko.observable(null);
 

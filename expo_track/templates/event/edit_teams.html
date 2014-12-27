@@ -12,6 +12,7 @@
         <div class="form-group">
             <label for="team-name">Name</label>
             <input data-bind="value: model().name" type="text" class="form-control" id="team-name" placeholder=""></input>
+            <span data-bind="validationMessage: model().name" class="validationMessage"></span>
         </div>
 
         <div class="form-group">

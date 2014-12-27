@@ -12,6 +12,7 @@
         <div class="form-group">
             <label for="location-name">Name</label>
             <input data-bind="value: model().name" type="text" class="form-control" id="location-name" placeholder=""></input>
+            <span data-bind="validationMessage: model().name" class="validationMessage"></span>
         </div>
 
         <div class="form-group">

@@ -1,6 +1,16 @@
 // ----------
 // Handles the configuration logic for the application
 
+// Configure validation
+ko.validation.configure({
+    messagesOnModified: true,
+    // Can not use insertMessages, must add span elements directly
+    // as updating the error function on model updates will disconnect
+    // the automatically added span from the model
+    insertMessages: false,
+    messageTemplate: null
+});
+
 // Generic interface for communicating with server 
 function ApiElementModel(model_type, data) {
     var self = this;
@@ -12,6 +22,37 @@ function ApiElementModel(model_type, data) {
     } else {
         self.model = ko.observable(new self.model_type());
         self.uri = null;
+    }
+    self.backup_model = null;
+
+    // Use deep false or else nested classes can cause validation
+    // errors
+    self.errors = ko.validation.group(self.model, {deep: false});
+
+    // Update error function whenever model changes
+    self.model.subscribe(function(updated_model) {
+        if(typeof updated_model !== 'undefined') {
+            self.errors = ko.validation.group(updated_model, {deep: false});
+        }
+    });
+
+    // Save a backup of the loaded model in case user cancels and 
+    // we can put back what we started with
+    self.begin_edit = function() {
+        self.load();
+        self.backup_model = self.model();
+    }
+
+    self.cancel_edit = function() {
+        if (self.backup_model != null) {
+            self.model(self.backup_model);
+        }
+        self.backup_model = null;
+    }
+
+    self.finish_edit = function() {
+        self.update();
+        self.backup_model = null;
     }
 
     // Get data for element from the server
@@ -41,17 +82,19 @@ function ApiListModel(model_type, columns, uri) {
     self.model_type = model_type;
     self.data_elements = ko.observableArray([]);
     self.uri = uri;
+
     self.edited_item = ko.observable();
     self.editing = ko.observable(false);
+
     self.grid_view_model = new ko.sortableGrid.viewModel({
         data: self.data_elements,
         columns: columns,
         pageSize: 10,
         beginEdit: function() {
             // Load full set of data for element
-            this.load();
-            self.editing(true);
+            this.begin_edit();
             self.edited_item(this);
+            self.editing(true);
         },
         remove: function() {
             var to_remove = this;
@@ -81,23 +124,28 @@ function ApiListModel(model_type, columns, uri) {
     }
 
     self.begin_new = function() {
-        self.editing(true);
         self.edited_item(new ApiElementModel(self.model_type));
+        self.editing(true);
     }
 
     self.cancel_edit = function() {
         self.editing(false);
+        self.edited_item().cancel_edit();
         self.edited_item(null);
     }
 
     self.finish_edit = function() {
-        self.editing(false);
-        if (self.edited_item().uri) {
-            self.edited_item().update();
+        if(self.edited_item().errors().length === 0) {
+            self.editing(false);
+            if (self.edited_item().uri) {
+                self.edited_item().finish_edit();
+            } else {
+                self.create_new();
+            }
+            self.edited_item(null);
         } else {
-            self.create_new();
+            self.edited_item().errors.showAllMessages();
         }
-        self.edited_item(null);
     }
      
     // Create a new element on the server
@@ -231,6 +279,14 @@ function UserApiListModel() {
           },
         ],
         users_uri);
+
+    // Extend base begin_new with additional functionality
+    var parent_begin_new = self.begin_new;
+    self.begin_new = function() {
+        // Make password required for new users
+        parent_begin_new();
+        self.edited_item().model().password.extend({required: true});
+    }
 
     // Handle linking drop down of person linked to user and the model
     self.editing_person_id = ko.observable();
