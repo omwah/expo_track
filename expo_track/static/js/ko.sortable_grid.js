@@ -28,6 +28,9 @@
             this.sortByClass = configuration.sortByClass || 'glyphicon glyphicon-sort';
             this.sortByClassAsc = configuration.sortByClassAsc || 'glyphicon glyphicon-arrow-up';
             this.sortByClassDesc = configuration.sortByClassDesc || 'glyphicon glyphicon-arrow-down';
+            this.sortCaseInsensitive = configuration.sortCaseInsensitive || true;
+                        
+
 
             // Call back functions for editing or removing row data
             this.beginEdit = configuration.beginEdit || undefined;
@@ -62,44 +65,40 @@
                 }
                 self.currentPageIndex(0);
             };
+
+            this.sortComparison = function(columnName) {
+                // Extract data in the various ways it might be nested or encapsulated
+                return function(a, b) {
+                    var val_a, val_b;
+                    if (typeof columnName === "function") {
+                        val_a = columnName(a);
+                        val_b = columnName(b);
+                    } else {
+                        val_a = a[columnName];
+                        val_b = b[columnName];
+                    }
+
+                    if (typeof val_a == "function") {
+                        val_a = val_a();
+                        val_b = val_b();
+                    }
+
+                    if (self.sortCaseInsensitive) {
+                        return val_a.toLowerCase() < val_b.toLowerCase() ? -1 : 1;
+                    } else {
+                        return val_a < val_b ? -1 : 1;
+                    }
+                };
+            };
+
             this.sortByAsc = function (columnName) {
-                if (typeof columnName === "function") {
-                    self.data.sort(function (a, b) {
-                        if(typeof columnName(a) == 'function') {
-                            return columnName(a)() < columnName(b)() ? -1 : 1;
-                        } else {
-                            return columnName(a) < columnName(b) ? -1 : 1;
-                        }
-                    });
-                } else {
-                    self.data.sort(function (a, b) {
-                        if(typeof a[columnName] == 'function') {
-                            return a[columnName]() < b[columnName]() ? -1 : 1;
-                        } else {
-                            return a[columnName] < b[columnName] ? -1 : 1;
-                        }
-                    });
-                }
+                self.data.sort(this.sortComparison(columnName));
             };
+
             this.sortByDesc = function (columnName) {
-                if (typeof columnName === "function") {
-                    self.data.reverse(function (a, b) {
-                        if(typeof columnName(a) == 'function') {
-                            return columnName(a)() < columnName(b)() ? -1 : 1;
-                        } else {
-                            return columnName(a) < columnName(b) ? -1 : 1;
-                        }
-                    });
-                } else {
-                    self.data.reverse(function (a, b) {
-                        if(typeof a[columnName] == 'function') {
-                            return a[columnName]() < b[columnName]() ? -1 : 1;
-                        } else {
-                            return a[columnName] < b[columnName] ? -1 : 1;
-                        }
-                    });
-                }
+                self.data.reverse(this.sortComparison(columnName));
             };
+
             this.sortByCSS = function (columnName) {
                 if (columnName !== undefined && columnName !== '') {
                     return self.lastSortedColumn() === columnName ? (self.lastSort() === 'Asc' ? self.sortByClassAsc : self.sortByClassDesc) : self.sortByClass;
