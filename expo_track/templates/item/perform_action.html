@@ -21,8 +21,8 @@
                     </div>
                 </div>
                     <div id="row">
-                    {% for type_code, type_name in status_types  %}
-                    <div class="col-md-{{ (12 / status_types|length)|int }}">
+                    {% for type_code, type_name in status_command_names  %}
+                    <div class="col-md-{{ (12 / status_command_names|length)|int }}">
                         <label class="radio-inline">
                             <input data-bind="checked: selected_status, click: load_items" type="radio" name="status-type" value="{{ type_code }}">{{ type_name }}
                         </label>

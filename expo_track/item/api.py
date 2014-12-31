@@ -1,5 +1,6 @@
 from flask.ext.restful import Resource, fields, marshal, marshal_with, reqparse
 from flask.ext.login import login_required
+from sqlalchemy.sql import or_
 from sqlalchemy.sql.expression import asc, desc
 
 from ..app import db
@@ -57,19 +58,25 @@ action_fields = {
     'uri': SafeUrlField('action'),
 }
 
+def item_parser():
+    parser = reqparse.RequestParser()
+    parser.add_argument('name', type=str, required=True)
+    parser.add_argument('tracking_number', type=str, required=True)
+    return parser
+
 class ItemListResource(Resource):
 
     @login_required
     @marshal_with(item_fields)
     def get(self):
         parser = reqparse.RequestParser()
-        parser.add_argument('status', type=int)
+        parser.add_argument('status', type=int, action='append')
         args = parser.parse_args()
 
         items_query = Item.query
 
         if args.status != None:
-            items_query = items_query.filter(Item.status == args.status)
+            items_query = items_query.filter(or_(*[Item.status == s for s in args.status]))
 
         return items_query.all()
 
@@ -77,10 +84,7 @@ class ItemListResource(Resource):
     @has_permission('add_item')
     @marshal_with(item_fields)
     def post(self):
-        parser = reqparse.RequestParser()
-        parser.add_argument('name', type=str, required=True)
-        parser.add_argument('tracking_number', type=str, required=True)
-        args = parser.parse_args()
+        args = item_parser().parse_args()
 
         item = Item(name=args.name, tracking_number=args.tracking_number, status=STATUS_CHECK_IN)
 
@@ -90,9 +94,6 @@ class ItemListResource(Resource):
         return item
 
 class ItemResource(Resource):
-    parser = reqparse.RequestParser()
-    parser.add_argument('name', type=str, required=True)
-    parser.add_argument('tracking_number', type=str, required=True)
 
     @login_required
     @marshal_with(item_fields)
@@ -103,7 +104,7 @@ class ItemResource(Resource):
     @has_permission('edit_item')
     @marshal_with(item_fields)
     def put(self, id):
-        args = self.parser.parse_args()
+        args = item_parser().parse_args()
 
         item = Item.query.filter(Item.id == id).first_or_404()
         

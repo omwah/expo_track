@@ -1,7 +1,7 @@
 from flask import Blueprint, render_template
 from flask.ext.login import current_user, login_required
 
-from ..item.constants import STATUS_TYPES
+from ..item.constants import STATUS_COMMAND_NAMES
 from ..person.constants import CONTACT_TYPES
 from ..user.models import Permission
 
@@ -10,7 +10,7 @@ mod = Blueprint('interface', __name__, url_prefix='')
 
 @mod.route('/')
 def index():
-    return render_template('interface/index.html', status_types=STATUS_TYPES.items())
+    return render_template('interface/index.html', status_command_names=STATUS_COMMAND_NAMES.items())
 
 @mod.route('/config')
 @login_required
