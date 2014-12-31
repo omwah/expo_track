@@ -7,10 +7,7 @@ var json_request = function(uri, method, data) {
     if(method.toLowerCase() == "get") {
         // Default value
         content_type = "application/x-www-form-urlencoded; charset=UTF-8";
-        // Make sure data is urlencoded correctly and not just serialized
-        if(typeof data !== "undefined") {
-            send_data = $.param(data, true);
-        }
+        send_data = data;
     } else {
         content_type = "application/json";
         send_data = ko.toJSON(data);
@@ -22,6 +19,8 @@ var json_request = function(uri, method, data) {
                            cache: false,
                            dataType: "json",
                            data: send_data,
+                           // Make sure data is urlencoded correctly and not just serialized
+                           traditional: true,
                          });
     return request;
 }
