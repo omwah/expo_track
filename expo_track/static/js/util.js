@@ -7,7 +7,10 @@ var json_request = function(uri, method, data) {
     if(method.toLowerCase() == "get") {
         // Default value
         content_type = "application/x-www-form-urlencoded; charset=UTF-8";
-        send_data = data;
+        // Make sure data is urlencoded correctly and not just serialized
+        if(typeof data !== "undefined") {
+            send_data = $.param(data, true);
+        }
     } else {
         content_type = "application/json";
         send_data = ko.toJSON(data);
