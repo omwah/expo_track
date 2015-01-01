@@ -4,6 +4,10 @@
 
 {# Include this only for our interface template #}
 {% block additional_js %}
+    <script>
+        var status_types = {{ status_types|tojson }};
+        var status_opposites = {{ status_opposites|tojson }};
+    </script>
     <script src="{{ url_for('static', filename='js/jquery-dateFormat.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface.js') }}"></script>
 {% endblock %}
@@ -11,5 +15,5 @@
 {% block body %}
     {% include "user/login.html" %}
     {% include "item/perform_action.html" %}
-    {% include "item/recent_actions.html" %}
+    {% include "item/items_and_actions.html" %}
 {% endblock %}

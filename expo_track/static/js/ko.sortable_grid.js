@@ -30,11 +30,14 @@
             this.sortByClassDesc = configuration.sortByClassDesc || 'glyphicon glyphicon-arrow-down';
             this.sortCaseInsensitive = configuration.sortCaseInsensitive || true;
                         
-
-
             // Call back functions for editing or removing row data
             this.beginEdit = configuration.beginEdit || undefined;
+            this.beginEditClass = configuration.beginEditClass || "glyphicon glyphicon-edit";
             this.remove = configuration.remove || undefined;
+            this.removeClass = configuration.removeClass || "glyphicon glyphicon-remove";
+
+            this.customAction = configuration.customAction || undefined;
+            this.customActionClass = configuration.customActionClass || 'glyphicon glyphicon-th';
 
             this.lastSortedColumn = ko.observable('');
             this.lastSort = ko.observable('Desc');
@@ -128,7 +131,7 @@
                                     <th><span data-bind=\"text: headerText\"></span></th>\
                                     <!-- /ko -->\
                                 <!-- /ko -->\
-                                <!-- ko if: beginEdit || remove -->\
+                                <!-- ko if: beginEdit || remove || customAction -->\
                                     <th>Actions</th>\
                                 <!-- /ko -->\
                                 </tr>\
@@ -138,14 +141,17 @@
                                <!-- ko foreach: $parent.columns -->\
                                    <td data-bind=\"text: typeof rowText == 'function' ? rowText($parent) : $parent[rowText], css: typeof rowClass !== 'undefined' ? rowClass : '' \"></td>\
                                <!-- /ko -->\
-                               <!-- ko if: $parent.beginEdit || $parent.remove -->\
+                               <!-- ko if: $parent.beginEdit || $parent.remove || $parent.customAction -->\
                                    <td class=\"col-md-1\">\
                                        <div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"Actions\">\
+                                           <!-- ko if: $parent.customAction -->\
+                                           <button data-bind=\"click: $parent.customAction\" type=\"button\" class=\"btn btn-default\"><span data-bind=\"css: $parent.customActionClass\"></span></button>\
+                                           <!-- /ko -->\
                                            <!-- ko if: $parent.beginEdit -->\
-                                           <button data-bind=\"click: $parent.beginEdit\" type=\"button\" class=\"btn btn-default\"><span class=\"glyphicon glyphicon-edit\"></span></button>\
+                                           <button data-bind=\"click: $parent.beginEdit\" type=\"button\" class=\"btn btn-default\"><span data-bind=\"css: $parent.beginEditClass\"></span></button>\
                                            <!-- /ko -->\
                                            <!-- ko if: $parent.remove -->\
-                                           <button data-bind=\"click: $parent.remove\" type=\"button\" class=\"btn btn-default\"><span class=\"glyphicon glyphicon-remove\"></span></button>\
+                                           <button data-bind=\"click: $parent.remove\" type=\"button\" class=\"btn btn-default\"><span data-bind=\"css: $parent.removeClass\"></span></button>\
                                            <!-- /ko -->\
                                        </div>\
                                    </td>\
