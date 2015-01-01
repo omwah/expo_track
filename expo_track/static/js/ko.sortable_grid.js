@@ -33,11 +33,15 @@
             // Call back functions for editing or removing row data
             this.beginEdit = configuration.beginEdit || undefined;
             this.beginEditClass = configuration.beginEditClass || "glyphicon glyphicon-edit";
+            this.canEdit = configuration.canEdit || function() { return this.beginEdit; };
+
             this.remove = configuration.remove || undefined;
             this.removeClass = configuration.removeClass || "glyphicon glyphicon-remove";
+            this.canRemove = configuration.canRemove || function() { return this.remove; };
 
             this.customAction = configuration.customAction || undefined;
             this.customActionClass = configuration.customActionClass || 'glyphicon glyphicon-th';
+            this.canCustom = configuration.canCustom || function() { return this.customAction; };
 
             this.lastSortedColumn = ko.observable('');
             this.lastSort = ko.observable('Desc');
@@ -131,7 +135,7 @@
                                     <th><span data-bind=\"text: headerText\"></span></th>\
                                     <!-- /ko -->\
                                 <!-- /ko -->\
-                                <!-- ko if: beginEdit || remove || customAction -->\
+                                <!-- ko if: canEdit() || canRemove() || canCustom() -->\
                                     <th>Actions</th>\
                                 <!-- /ko -->\
                                 </tr>\
@@ -141,7 +145,7 @@
                                <!-- ko foreach: $parent.columns -->\
                                    <td data-bind=\"text: typeof rowText == 'function' ? rowText($parent) : $parent[rowText], css: typeof rowClass !== 'undefined' ? rowClass : '' \"></td>\
                                <!-- /ko -->\
-                               <!-- ko if: $parent.beginEdit || $parent.remove || $parent.customAction -->\
+                               <!-- ko if: $parent.canEdit() || $parent.canRemove() || $parent.canCustom() -->\
                                    <td class=\"col-md-1\">\
                                        <div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"Actions\">\
                                            <!-- ko if: $parent.customAction -->\

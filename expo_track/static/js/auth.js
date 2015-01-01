@@ -13,6 +13,10 @@ function AuthViewModel() {
     self.remember_me = ko.observable();
     self.authenticated = ko.observable(false);
 
+    self.has_permission = function(perm) {
+        return self.permissions.indexOf(perm) >= 0;
+    };
+
     self.login = function(data) {
         json_request(login_uri, "POST", data).then(
             function(ret_data, textStatus, jqXHR) {
@@ -20,7 +24,6 @@ function AuthViewModel() {
                 self.authenticated(true);
                 self.password("");
                 self.load_permissions();
-                $(document).trigger("login");
             },
             function(jqXHR, textStatus, errorThrown) {
                 // .failed()
@@ -53,7 +56,6 @@ function AuthViewModel() {
                 self.authenticated(true);
                 self.username(ret_data['username']);
                 self.load_permissions();
-                $(document).trigger("login");
             },
             function(jqXHR, textStatus, errorThrown) {
                 // .failed()
@@ -69,6 +71,9 @@ function AuthViewModel() {
     self.load_permissions = function() {
         json_request(profile_uri, "GET").done(function(ret_data) {
             self.permissions(ret_data["permissions"]);
+
+            // Trigger login events here so we know permissions are loaded
+            $(document).trigger("login");
         });
     }
 

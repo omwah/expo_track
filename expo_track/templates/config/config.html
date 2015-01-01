@@ -33,7 +33,7 @@
             <div data-bind="visible: active_tab() === 'teams'">
                 {% include "config/edit_teams.html" %}
             </div>
-            <div data-bind="visible: active_tab() === 'users'">
+            <div data-bind="visible: active_tab() === 'users' && $root.auth().has_permission('view_user')">
                 {% include "config/edit_users.html" %}
             </div>
         </div>

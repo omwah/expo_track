@@ -76,41 +76,56 @@ function ApiElementModel(model_type, data) {
 
 }
 
-function ApiListModel(model_type, columns, uri) {
+function ApiListModel(model_type, columns, perm_suffix, uri) {
     var self = this;
 
     self.model_type = model_type;
     self.data_elements = ko.observableArray([]);
+    self.perm_suffix = perm_suffix;
     self.uri = uri;
 
     self.edited_item = ko.observable();
     self.editing = ko.observable(false);
 
+    self.can_add = ko.computed(function() {
+        return auth_view_model.has_permission("add_" + perm_suffix);
+    });
+
+    self.begin_edit = function() {
+        // Load full set of data for element
+        this.begin_edit();
+        self.edited_item(this);
+        self.editing(true);
+    }
+
+    self.remove = function() {
+        var to_remove = this;
+
+        var confirmed;
+        if (to_remove.model().name) {
+            confirmed = confirm("Are you sure you want to remove: " + to_remove.model().name());
+        } else {
+            confirmed = confirm("Are you sure you want to remove this element?");
+        }
+
+        if (confirmed) {
+            json_request(to_remove.uri, "DELETE").done(function(ret_data) {
+                self.data_elements.remove(to_remove);
+            });
+        }
+    }
+
     self.grid_view_model = new ko.sortableGrid.viewModel({
         data: self.data_elements,
         columns: columns,
         pageSize: 10,
-        beginEdit: function() {
-            // Load full set of data for element
-            this.begin_edit();
-            self.edited_item(this);
-            self.editing(true);
+        beginEdit: self.begin_edit,
+        canEdit: function() { 
+            return auth_view_model.has_permission("edit_" + self.perm_suffix) 
         },
-        remove: function() {
-            var to_remove = this;
-
-            var confirmed;
-            if (to_remove.model().name) {
-                confirmed = confirm("Are you sure you want to remove: " + to_remove.model().name());
-            } else {
-                confirmed = confirm("Are you sure you want to remove this element?");
-            }
-
-            if (confirmed) {
-                json_request(to_remove.uri, "DELETE").done(function(ret_data) {
-                    self.data_elements.remove(to_remove);
-                });
-            }
+        remove: self.remove,
+        canRemove: function() { 
+            return auth_view_model.has_permission("delete_" + self.perm_suffix) 
         },
     });
 
@@ -187,7 +202,7 @@ function TeamApiListModel() {
             isSortable: true, rowClass: "col-md-5"
           },
         ],
-        teams_uri);
+        "team", teams_uri);
 
     self.locations = function() {
         // Locations for teams that includes a null at the beginning
@@ -278,7 +293,16 @@ function UserApiListModel() {
             isSortable: true, rowClass: "col-md-5"
           },
         ],
-        users_uri);
+        "user", users_uri);
+
+    // Extend load function so we will only load the data
+    // with sufficient permissions
+    var parent_load = self.load;
+    self.load = function() {
+        if(auth_view_model.has_permission("view_user")) {
+            parent_load();
+        }
+    }
 
     // Extend base begin_new with additional functionality
     var parent_begin_new = self.begin_new;
@@ -338,14 +362,19 @@ function BaseViewModel() {
     self.auth = ko.observable(auth_view_model);
 
     self.active_tab = ko.observable("items");
-    self.tabs = ko.observableArray([
+    self.tabs = ko.computed(function() {
+        var tabs = [
             { name: "items", title: "Items" },
             { name: "people", title: "People" },
             { name: "events", title: "Events" },
             { name: "locations", title: "Locations" },
             { name: "teams", title: "Teams" },
-            { name: "users", title: "Users" },
-    ]);
+        ]
+        if (self.auth().has_permission("view_user")) {
+            tabs.push({ name: "users", title: "Users" });
+        }
+        return tabs;
+    });
 
     self.items = ko.observable(new ApiListModel(ItemModel, 
                  [
@@ -365,7 +394,7 @@ function BaseViewModel() {
                      isSortable: true, rowClass: "col-md-3",
                    },
                  ],
-                 items_uri));
+                 "item", items_uri));
 
     self.people = ko.observable(new ApiListModel(PersonModel, 
                  [
@@ -380,6 +409,7 @@ function BaseViewModel() {
                      isSortable: false, rowClass: "col-md-2"
                    },
                  ],
+                 "person",
                  // For configuration interface show all people
                  people_uri + "?allow_hidden=True"));
 
@@ -391,7 +421,7 @@ function BaseViewModel() {
                      isSortable: true, rowClass: "col-md-10"
                    },
                  ],
-                 events_uri));
+                 "event", events_uri));
 
     self.locations = ko.observable(new ApiListModel(LocationModel, 
                  [
@@ -401,7 +431,7 @@ function BaseViewModel() {
                      isSortable: true, rowClass: "col-md-10"
                    },
                  ],
-                 locations_uri));
+                 "location", locations_uri));
 
     self.teams = ko.observable(new TeamApiListModel());
     

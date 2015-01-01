@@ -1,6 +1,6 @@
 {# This template is intended to be included in other templates #}
 <div data-bind="with: items, visible: items().editing() === false">
-    <h1>Items <button data-bind="click: begin_new" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button></h1>
+    <h1>Items <button data-bind="click: begin_new, visible: can_add" class="btn btn-default"><span class="glyphicon glyphicon-plus"></span></button></h1>
     <div data-bind='sortableGrid: grid_view_model'> </div>
 </div>
 
