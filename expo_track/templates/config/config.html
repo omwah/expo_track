@@ -7,7 +7,7 @@
 {% endblock %}
 
 {% block body %}
-    {% include "user/login.html" %}
+    {% include "login.html" %}
     <div data-bind="visible: auth().authenticated" class="row">
         <div class="col-md-2">
             <ul data-bind="foreach: tabs" class="nav nav-pills nav-stacked">
@@ -19,22 +19,22 @@
 
         <div class="col-md-10">
             <div data-bind="visible: active_tab() === 'items'">
-                {% include "item/edit_items.html" %}
+                {% include "config/edit_items.html" %}
             </div>
             <div data-bind="visible: active_tab() === 'people'">
-                {% include "person/edit_people.html" %}
+                {% include "config/edit_people.html" %}
             </div>
             <div data-bind="visible: active_tab() === 'events'">
-                {% include "event/edit_events.html" %}
+                {% include "config/edit_events.html" %}
             </div>
             <div data-bind="visible: active_tab() === 'locations'">
-                {% include "event/edit_locations.html" %}
+                {% include "config/edit_locations.html" %}
             </div>
             <div data-bind="visible: active_tab() === 'teams'">
-                {% include "event/edit_teams.html" %}
+                {% include "config/edit_teams.html" %}
             </div>
             <div data-bind="visible: active_tab() === 'users'">
-                {% include "user/edit_users.html" %}
+                {% include "config/edit_users.html" %}
             </div>
         </div>
     </div>

@@ -10,7 +10,7 @@ mod = Blueprint('interface', __name__, url_prefix='')
 
 @mod.route('/')
 def index():
-    return render_template('interface/index.html',
+    return render_template('interface/interface.html',
             status_types=STATUS_TYPES,
             status_command_names=STATUS_COMMAND_NAMES.items(),
             status_opposites=STATUS_OPPOSITES)
@@ -29,4 +29,4 @@ def config():
 
     permissions = sorted([ p.name for p in Permission.query.all() ], cmp=perm_compare)
 
-    return render_template('interface/config.html', current_user=current_user, contact_types=CONTACT_TYPES.items(), permissions=permissions)
+    return render_template('config/config.html', current_user=current_user, contact_types=CONTACT_TYPES.items(), permissions=permissions)
