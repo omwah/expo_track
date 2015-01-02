@@ -1,3 +1,4 @@
+// Standard way requests are done in this application
 var json_request = function(uri, method, data) {
     // For GET calls can not use json as content type or else
     // magic quotes start being introduced messing up the query

@@ -1,0 +1,1 @@
+EVENT_DATE_FORMAT = '%Y-%m-%d'

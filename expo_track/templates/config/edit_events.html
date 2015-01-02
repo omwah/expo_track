@@ -20,7 +20,28 @@
             <textarea data-bind="value: model().description" rows=5 class="form-control" id="event-description" placeholder=""></textarea>
         </div>
 
-        <p>
+        <div class="form-group">
+            <div class="row">
+                <div class="col-md-6">
+                    <label for="event-begin-date">Begin Date</label>
+                </div>
+                <div class="col-md-6">
+                    <label for="event-end-date">End Date</label>
+                </div>
+            </div>
+            <div class="row">
+                <div class="col-md-6">
+                    <input data-bind="value: model().begin_date" type="text" class="form-control datepicker" id="event-begin-date">
+                    <span data-bind="validationMessage: model().begin_date" class="validationMessage"></span>
+                </div>
+                <div class="col-md-6">
+                    <input data-bind="value: model().end_date" type="text" class="form-control datepicker" id="event-end-date">
+                    <span data-bind="validationMessage: model().end_date" class="validationMessage"></span>
+                </div>
+            </div>
+        </div>
+
+         <p>
             <button data-bind="click: $parent.cancel_edit" class="btn btn-default">Cancel</button>
             <button data-bind="click: $parent.finish_edit" class="btn btn-default btn-primary">Apply</button>
         </p>

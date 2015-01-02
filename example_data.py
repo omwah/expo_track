@@ -41,8 +41,13 @@ for perm in [ 'perform_action', 'add_item', 'delete_item', 'edit_item',
 db.session.add(test_user)
 
 # Add an event
-linux_expo = models.Event(name="Southern California Linux Expo",
-                          description="SCALE's mission is to provide educational opportunities on the topic of Open Source software. Open Source software is any software that meets the litmus test of the OSI (Open Source Initiative)")
+def date_parse(date_str):
+    return datetime.strptime(date_str, "%Y-%m-%d")
+
+scale_desc = "SCALE's mission is to provide educational opportunities on the topic of Open Source software. Open Source software is any software that meets the litmus test of the OSI (Open Source Initiative)"
+linux_expo = models.Event(name="Southern California Linux Expo 13x",
+                          description=scale_desc,
+                          begin_date=date_parse("2015-02-19"), end_date=date_parse("2015-02-22"))
 db.session.add(linux_expo)
 
 room_names = [ "La Jolla",

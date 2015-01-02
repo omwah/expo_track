@@ -15,6 +15,9 @@ class Event(db.Model):
     name = db.Column(db.String(128), nullable=False)
     description = db.Column(db.String(1024))
 
+    begin_date = db.Column(db.DateTime, nullable=False)
+    end_date = db.Column(db.DateTime, nullable=False)
+
     logo_filename = db.Column(db.String(1024))
 
 class Location(db.Model):

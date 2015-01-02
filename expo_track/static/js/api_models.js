@@ -75,10 +75,12 @@ function EventModel(data) {
     var self = this;
 
     var attributes =
-        ["id", "name", "description", "uri"];
+        ["id", "name", "description", "begin_date", "end_date", "uri"];
     make_api_attributes(self, data, attributes);
 
     self.name.extend({required: true});
+    self.begin_date.extend({required: true});
+    self.end_date.extend({required: true});
 }
 
 function LocationModel(data) {

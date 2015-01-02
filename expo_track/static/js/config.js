@@ -181,6 +181,124 @@ function ApiListModel(model_type, columns, perm_suffix, uri) {
     });
 }
 
+function ItemsApiListModel() {
+    var self = new ApiListModel(ItemModel, 
+        [
+          { headerText: "Tracking No.", 
+            rowText: function(row) { 
+                return row.model().tracking_number;
+            }, 
+            isSortable: true, rowClass: "col-md-2"
+          },
+          { headerText: "Name",
+            rowText: function(row) { 
+                return row.model().name;
+            },
+            isSortable: true, rowClass: "col-md-6",
+          },
+          { headerText: "Status",
+            rowText: function(row) { 
+                return row.model().status;
+            }, 
+            isSortable: true, rowClass: "col-md-3",
+          },
+        ],
+        "item", items_uri);
+
+    return self;
+}
+
+function PeopleApiListModel() {
+    var self = new ApiListModel(PersonModel, 
+        [
+          { headerText: "Name", 
+            rowText: function(row) { 
+                return row.model().display_name;
+            }, 
+            isSortable: true, rowClass: "col-md-8"
+          },
+          { headerText: "Hidden", 
+            rowText: function(row) { 
+                return row.model().hidden;
+            }, 
+            isSortable: false, rowClass: "col-md-2"
+          },
+        ],
+        "person",
+        // For configuration interface show all people
+        people_uri + "?allow_hidden=True");
+
+    return self;
+}
+
+function EventsApiListModel() {
+    var self = new ApiListModel(EventModel, 
+        [
+          { headerText: "Name", 
+            rowText: function(row) { 
+                return row.model().name;
+            }, 
+            isSortable: true, rowClass: "col-md-7"
+          },
+          { headerText: "Begin Date", 
+            rowText: function(row) { 
+                return row.model().begin_date;
+            }, 
+            isSortable: true, rowClass: "col-md-2"
+          },
+          { headerText: "End Date", 
+            rowText: function(row) { 
+                return row.model().end_date;
+            }, 
+            isSortable: true, rowClass: "col-md-2"
+          },
+        ],
+        "event", events_uri);
+
+    self.apply_datepickers = function() {
+        // For picking dates and outputting text
+        $('.datepicker').datepicker({
+            format: "yyyy-mm-dd",
+            todayBtn: "linked",
+            autoclose: true,
+            todayHighlight: true
+        });
+    }
+
+    // Override begin_edit and begin_new to enable datepickers
+    // must be done each time edit is called because HTML
+    // is destroyed when edit window goes away
+    var parent_begin_new = self.begin_new;
+    self.begin_new = function() {
+        parent_begin_new();
+        self.apply_datepickers();
+    }
+
+    var parent_begin_edit = self.begin_edit;
+    self.grid_view_model.beginEdit = function() {
+        // Use call on parent function so we can
+        // pass the correct this object
+        parent_begin_edit.call(this);
+        self.apply_datepickers();
+    }
+
+    return self;
+}
+
+function LocationsApiListModel() {
+    var self = new ApiListModel(LocationModel, 
+        [
+          { headerText: "Name", 
+            rowText: function(row) { 
+                return row.model().name;
+            }, 
+            isSortable: true, rowClass: "col-md-10"
+          },
+        ],
+        "location", locations_uri);
+    return self;
+}
+
 function TeamApiListModel() {
     // Extends ApiListModel with mechanisms for the Team interface
     var self = new ApiListModel(TeamModel, 
@@ -376,62 +494,13 @@ function BaseViewModel() {
         return tabs;
     });
 
-    self.items = ko.observable(new ApiListModel(ItemModel, 
-                 [
-                   { headerText: "Tracking No.", 
-                     rowText: function(row) { 
-                         return row.model().tracking_number }, 
-                     isSortable: true, rowClass: "col-md-2"
-                   },
-                   { headerText: "Name",
-                     rowText: function(row) { 
-                         return row.model().name },
-                     isSortable: true, rowClass: "col-md-6",
-                   },
-                   { headerText: "Status",
-                     rowText: function(row) { 
-                         return row.model().status }, 
-                     isSortable: true, rowClass: "col-md-3",
-                   },
-                 ],
-                 "item", items_uri));
+    self.items = ko.observable(new ItemsApiListModel());
 
-    self.people = ko.observable(new ApiListModel(PersonModel, 
-                 [
-                   { headerText: "Name", 
-                     rowText: function(row) { 
-                         return row.model().display_name }, 
-                     isSortable: true, rowClass: "col-md-8"
-                   },
-                   { headerText: "Hidden", 
-                     rowText: function(row) { 
-                         return row.model().hidden }, 
-                     isSortable: false, rowClass: "col-md-2"
-                   },
-                 ],
-                 "person",
-                 // For configuration interface show all people
-                 people_uri + "?allow_hidden=True"));
+    self.people = ko.observable(new PeopleApiListModel());
 
-    self.events = ko.observable(new ApiListModel(EventModel, 
-                 [
-                   { headerText: "Name", 
-                     rowText: function(row) { 
-                         return row.model().name }, 
-                     isSortable: true, rowClass: "col-md-10"
-                   },
-                 ],
-                 "event", events_uri));
+    self.events = ko.observable(new EventsApiListModel());
 
-    self.locations = ko.observable(new ApiListModel(LocationModel, 
-                 [
-                   { headerText: "Name", 
-                     rowText: function(row) { 
-                         return row.model().name }, 
-                     isSortable: true, rowClass: "col-md-10"
-                   },
-                 ],
-                 "location", locations_uri));
+    self.locations = ko.observable(new LocationsApiListModel());
 
     self.teams = ko.observable(new TeamApiListModel());
     

@@ -1,3 +1,5 @@
+from datetime import datetime
+
 from flask.ext.restful import Resource, fields, marshal_with, reqparse
 from flask.ext.login import login_required
 
@@ -8,10 +10,18 @@ from ..user.decorators import has_permission
 from models import Event, Location, Team
 from ..person.models import Person
 
+from .constants import EVENT_DATE_FORMAT
+
+class EventDateField(fields.Raw):
+    def format(self, value):
+        return value.strftime(EVENT_DATE_FORMAT)
+
 event_fields = {
     'id': fields.String,
     'name': fields.String,
     'description': fields.String,
+    'begin_date': EventDateField,
+    'end_date': EventDateField,
     'uri': SafeUrlField('event'),
 }
 
@@ -38,10 +48,20 @@ team_fields = {
     'uri': SafeUrlField('team'),
 }
 
+def event_date(date_str):
+    try:
+        return datetime.strptime(date_str, EVENT_DATE_FORMAT)
+    except ValueError as exc:
+        import traceback
+        traceback.print_exc()
+        raise
+
 def event_parser():
     parser = reqparse.RequestParser()
     parser.add_argument('name', type=str, required=True)
     parser.add_argument('description', type=str)
+    parser.add_argument('begin_date', type=event_date, required=True)
+    parser.add_argument('end_date', type=event_date, required=True)
     return parser
 
 class EventListResource(Resource):
@@ -58,7 +78,10 @@ class EventListResource(Resource):
     def post(self):
         args = event_parser().parse_args()
 
-        event = Event(name=args.name, description=args.description)
+        event = Event(name=args.name, 
+            description=args.description,
+            begin_date=args.begin_date,
+            end_date=args.end_date)
 
         db.session.add(event)
         db.session.commit()
@@ -82,6 +105,8 @@ class EventResource(Resource):
 
         event.name = args.name
         event.description = args.description
+        event.begin_date = args.begin_date
+        event.end_date = args.end_date
 
         db.session.commit()
 
