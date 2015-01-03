@@ -90,7 +90,7 @@ function PerformActionModel(all_items) {
             send_data = { 
                 status: status_opposites[self.selected_status()],
                 item_id: self.selected_item(),
-                event_id: base_view_model.event().model().id()
+                event_id: base_view_model.event().current().id()
             }
 
             json_request(actions_uri, "GET", send_data).done(function(ret_data) {
@@ -151,7 +151,7 @@ function PerformActionModel(all_items) {
         action_data = { 'status': self.selected_status(),
                         'person_id': self.selected_person(),
                         'item_id': self.selected_item(),
-                        'event_id': base_view_model.event().model().id() }
+                        'event_id': base_view_model.event().current().id() }
         json_request(actions_uri, "POST", action_data).done(function(ret_data) {
             created_action = new ActionItemModel(ret_data); 
             $(document).trigger("item_action", created_action);
@@ -248,7 +248,7 @@ function ActionsViewModel() {
 
     self.load = function() {
         self.recent([]);
-        send_data = { "event_id": base_view_model.event().model().id() }
+        send_data = { "event_id": base_view_model.event().current().id() }
         json_request(actions_uri, "GET", send_data).done(function(ret_data) {
             var mapped_actions = $.map(ret_data, function(action) { 
                 return new ActionItemModel(action); 
@@ -275,14 +275,47 @@ function ActionsViewModel() {
 function EventViewModel() {
     var self = this;
 
-    self.model = ko.observable(new EventModel());
+    self.all = ko.observableArray([]);
+    self.current = ko.observable(new EventModel());
+    self.selected_id = ko.observable();
 
     self.load = function() {
+        json_request(events_uri, "GET").done(function(ret_data) {
+            var mapped_events = $.map(ret_data, function(event) {
+                return new EventModel(event);
+            });
+            self.all(mapped_events);
+        });
+
         var send_data = { soonest: true }
         json_request(events_uri, "GET", send_data).done(function(ret_data) {
-            self.model(new EventModel(ret_data[0]));
+            self.current(new EventModel(ret_data[0]));
             $(document).trigger("event_loaded");
         });
+    }
+
+    // Hide the switch button normally unless mouse is in the
+    // event-info area
+    $("#change-event").hide();
+    $("#event-info").on("mouseenter", function(e) {
+        $("#change-event").show();
+    });
+    $("#event-info").on("mouseleave", function(e) {
+        $("#change-event").hide();
+    });
+
+    self.begin_change = function() {
+        $("#change-event-modal").modal("show");
+        self.selected_id(self.current().id());
+    }
+
+    self.end_change = function() {
+        $("#change-event-modal").modal("hide");
+        var selected_obj = ko.utils.arrayFirst(self.all(), function(event) {
+            return event.id() === self.selected_id();
+        });
+        self.current(selected_obj);
+        $(document).trigger("event_loaded");
     }
 
     return self;
