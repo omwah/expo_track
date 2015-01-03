@@ -1,0 +1,9 @@
+<div data-bind="visible: auth().authenticated" class="row vertical-align">
+    <div data-bind="with: event().model" class="col-md-9">
+        <h2 data-bind="text: name"></h2>
+        <p><span data-bind="text: begin_date_fmt"></span> - <span data-bind="text: end_date_fmt"></span></p>
+    </div>
+    <div class="col-md-3">
+        <button data-bind="click: perform().begin_action" type="button" class="btn btn-primary btn-lg">Fast Check In/Out</button>
+    </div>
+</div>

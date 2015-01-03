@@ -79,7 +79,7 @@ function PerformActionModel(all_items) {
     };
 
     // Load data from server when page is loaded
-    $(document).on("login", function() {
+    $(document).on("event_loaded", function() {
         self.load_people();
     });
 
@@ -88,8 +88,9 @@ function PerformActionModel(all_items) {
     self.select_relevant_person = function() {
         if(self.selected_item()) {
             send_data = { 
-                "status": status_opposites[self.selected_status()],
-                "item_id": self.selected_item()
+                status: status_opposites[self.selected_status()],
+                item_id: self.selected_item(),
+                event_id: base_view_model.event().model().id()
             }
 
             json_request(actions_uri, "GET", send_data).done(function(ret_data) {
@@ -150,7 +151,7 @@ function PerformActionModel(all_items) {
         action_data = { 'status': self.selected_status(),
                         'person_id': self.selected_person(),
                         'item_id': self.selected_item(),
-                        'event_id': 1 }
+                        'event_id': base_view_model.event().model().id() }
         json_request(actions_uri, "POST", action_data).done(function(ret_data) {
             created_action = new ActionItemModel(ret_data); 
             $(document).trigger("item_action", created_action);
@@ -247,7 +248,8 @@ function ActionsViewModel() {
 
     self.load = function() {
         self.recent([]);
-        json_request(actions_uri, "GET").done(function(ret_data) {
+        send_data = { "event_id": base_view_model.event().model().id() }
+        json_request(actions_uri, "GET", send_data).done(function(ret_data) {
             var mapped_actions = $.map(ret_data, function(action) { 
                 return new ActionItemModel(action); 
             });
@@ -255,7 +257,7 @@ function ActionsViewModel() {
         });
     };
 
-    $(document).on("login", function() {
+    $(document).on("event_loaded", function() {
         self.load();
     });
 
@@ -268,6 +270,22 @@ function ActionsViewModel() {
         self.recent.unshift(action);
     });
 
+}
+
+function EventViewModel() {
+    var self = this;
+
+    self.model = ko.observable(new EventModel());
+
+    self.load = function() {
+        var send_data = { soonest: true }
+        json_request(events_uri, "GET", send_data).done(function(ret_data) {
+            self.model(new EventModel(ret_data[0]));
+            $(document).trigger("event_loaded");
+        });
+    }
+
+    return self;
 }
 
 // ----------
@@ -285,6 +303,8 @@ function BaseViewModel() {
     self.perform = ko.observable(new PerformActionModel(self.items().items));
     self.actions = ko.observable(new ActionsViewModel());
 
+    self.event = ko.observable(new EventViewModel());
+    
     $(document).on("login", function() {
         // When status def has been loaded then load the tabs for items
         var tabs = [];
@@ -295,6 +315,7 @@ function BaseViewModel() {
         tabs.push({name: "actions", title: "Actions Log"})
         self.tabs(tabs);
         self.active_tab(tabs[0].name);
+        self.event().load();
     });
 
     self.active_tab.subscribe(function(new_active) {

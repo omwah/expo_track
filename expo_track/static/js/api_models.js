@@ -71,8 +71,10 @@ function PersonModel(data) {
     };
 }
 
-function EventModel(data) {
+function EventModel(data, date_fmt) {
     var self = this;
+
+    self.date_fmt = date_fmt ? date_fmt : "MM/dd/yyyy";
 
     var attributes =
         ["id", "name", "description", "begin_date", "end_date", "uri"];
@@ -81,6 +83,20 @@ function EventModel(data) {
     self.name.extend({required: true});
     self.begin_date.extend({required: true});
     self.end_date.extend({required: true});
+
+    self.format_date = function(date_str) {
+        // Backend just gives a date, w/o time, so add time to string
+        // so jquery-dateFormat can recognize
+        return $.format.date(date_str + "T00:00:00Z", self.date_fmt);
+    }
+
+    self.begin_date_fmt = ko.computed(function() {
+        return self.format_date(self.begin_date());
+    });
+
+    self.end_date_fmt = ko.computed(function() {
+        return self.format_date(self.end_date());
+    });
 }
 
 function LocationModel(data) {

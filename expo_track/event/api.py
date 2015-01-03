@@ -1,7 +1,9 @@
-from datetime import datetime
+from datetime import datetime, date
 
 from flask.ext.restful import Resource, fields, marshal_with, reqparse
 from flask.ext.login import login_required
+
+from sqlalchemy.sql import asc
 
 from ..app import db
 from ..utils import SafeUrlField
@@ -69,7 +71,16 @@ class EventListResource(Resource):
     @login_required
     @marshal_with(event_fields)
     def get(self):
-        events = Event.query.all()
+        parser = reqparse.RequestParser()
+        parser.add_argument('soonest', type=bool, default=False)
+        args = parser.parse_args()
+
+        if args.soonest:
+            # Events occuring closest to current time and ordered by beginning date
+            events = Event.query.filter(Event.begin_date >= date.today()).order_by(asc(Event.begin_date)).all()
+        else:
+            events = Event.query.all()
+
         return events
 
     @login_required

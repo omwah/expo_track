@@ -42,3 +42,11 @@
 
 /* For validation messages */
 .validationMessage { color: red; }
+
+
+/* Add to a row div to vertically align elements in columns
+ * see: http://stackoverflow.com/questions/20547819/vertical-align-with-bootstrap-3 */
+.vertical-align {
+    display: flex;
+    align-items: center;
+}

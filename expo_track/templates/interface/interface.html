@@ -8,12 +8,12 @@
         var status_types = {{ status_types|tojson }};
         var status_opposites = {{ status_opposites|tojson }};
     </script>
-    <script src="{{ url_for('static', filename='js/jquery-dateFormat.min.js') }}"></script>
     <script src="{{ url_for('static', filename='js/interface.js') }}"></script>
 {% endblock %}
 
 {% block body %}
     {% include "login.html" %}
     {% include "interface/perform_action.html" %}
+    {% include "interface/top_info.html" %}
     {% include "interface/items_and_actions.html" %}
 {% endblock %}

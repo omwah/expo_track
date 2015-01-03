@@ -242,13 +242,13 @@ function EventsApiListModel() {
           },
           { headerText: "Begin Date", 
             rowText: function(row) { 
-                return row.model().begin_date;
+                return row.model().begin_date_fmt;
             }, 
             isSortable: true, rowClass: "col-md-2"
           },
           { headerText: "End Date", 
             rowText: function(row) { 
-                return row.model().end_date;
+                return row.model().end_date_fmt;
             }, 
             isSortable: true, rowClass: "col-md-2"
           },

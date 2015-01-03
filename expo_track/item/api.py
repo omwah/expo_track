@@ -136,6 +136,7 @@ class ActionListResource(Resource):
         parser.add_argument('item_id', type=int)
         parser.add_argument('status', type=int)
         parser.add_argument('ascending', type=bool, default=False)
+        parser.add_argument('event_id', type=int)
         args = parser.parse_args()
         
         actions_query = Action.query
@@ -151,6 +152,9 @@ class ActionListResource(Resource):
 
         if args.status != None:
             actions_query = actions_query.filter(Action.status == args.status)
+
+        if args.event_id != None:
+            actions_query = actions_query.filter(Action.event_id == args.event_id)
 
         return actions_query.all()
 
