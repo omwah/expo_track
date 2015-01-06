@@ -13,6 +13,32 @@ var make_api_attributes = function(self, data, attributes) {
     }
 }
 
+function ActionModel(data) {
+    var self = this;
+
+    var attributes =
+        ["id", "date", "uri"];
+    make_api_attributes(self, data, attributes);
+
+    if (data && data.item) {
+        self.item = ko.observable(data.item.name);
+    } else {
+        self.item = ko.observable("");
+    }
+
+    if (data && data.status) {
+        self.status = ko.observable(data.status.name);
+    } else {
+        self.status = ko.observable("");
+    }
+
+    if (data && data.person) {
+        self.who = ko.observable(new PersonModel(data.person));
+    } else {
+        self.who = ko.observable(null);
+    }
+}
+
 function ItemModel(data) {
     var self = this;
 
@@ -22,7 +48,11 @@ function ItemModel(data) {
 
     self.name.extend({required: true});
 
-    self.status = ko.observable(data && data.status ? data.status.name : null);
+    if (data && data.last_action) {
+        self.last_action = ko.observable(new ActionModel(data.last_action));
+    } else {
+        self.last_action = ko.observable(null);
+    }   
 }
 
 function ContactModel(data) {

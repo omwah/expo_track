@@ -2,17 +2,6 @@
 // Action interactions
 // -------------------
 
-function ActionItemModel(data) {
-    var self = this;
-
-    self.id = ko.observable(data.id);
-    self.date = ko.observable(data.date);
-    self.item = ko.observable(data.item.name);
-    self.status = ko.observable(data.status.name);
-    self.who = ko.observable(new PersonModel(data.person));
-    self.uri = ko.observable(data.uri);
-}
-
 function AddPersonModel(perform) {
     var self = this;
 
@@ -65,7 +54,7 @@ function PerformActionModel(all_items) {
     self.available_items = ko.computed(function() {
         var curr_status_name = status_types[self.selected_status()];
         return ko.utils.arrayFilter(self.all_items(), function(item) {
-            return item.status() !== curr_status_name;
+            return item.last_action().status() !== curr_status_name;
         });
     });
 
@@ -120,9 +109,9 @@ function PerformActionModel(all_items) {
             // Also select the current status as one to hide in the check boxes
             var item_sel_status = null;
             for (var status_id in status_types) {
-                if(!item_sel_status && item.status() !== status_types[status_id]) {
+                if(!item_sel_status && item.last_action().status() !== status_types[status_id]) {
                     item_sel_status = status_id;
-                } else if (item.status() === status_types[status_id]) {
+                } else if (item.last_action().status() === status_types[status_id]) {
                     self.hide_status(status_id);
                 }
             }
@@ -153,7 +142,7 @@ function PerformActionModel(all_items) {
                         'item_id': self.selected_item(),
                         'event_id': base_view_model.event().current().id() }
         json_request(actions_uri, "POST", action_data).done(function(ret_data) {
-            created_action = new ActionItemModel(ret_data); 
+            created_action = new ActionModel(ret_data); 
             $(document).trigger("item_action", created_action);
         });
 
@@ -169,19 +158,24 @@ function ItemsViewModel(active_status) {
     self.grid_view_model = new ko.sortableGrid.viewModel({
         data: ko.computed(function() {
             return ko.utils.arrayFilter(self.items(), function(item) {
-                return item.status() === active_status();
+                return item.last_action().status() === active_status();
             });
         }),
         columns: [
             { headerText: "Number", rowText: "tracking_number",
               isSortable: false, rowClass: "col-md-2",
             },
-             { headerText: "Name", rowText: "name",
-              isSortable: false, rowClass: "col-md-4",
+            { headerText: "Name", rowText: "name",
+              isSortable: false, rowClass: "col-md-3",
             },
             { headerText: "Description", rowText: "description",
-              isSortable: false, rowClass: "col-md-5",
+              isSortable: false, rowClass: "col-md-4",
             },         
+            { headerText: "Who", rowText: function(item) {
+                  return item.last_action().who().display_name();
+              },
+              isSortable: false, rowClass: "col-md-3",
+            },
         ],
         customAction: function() {
             base_view_model.perform().begin_action(this);
@@ -214,7 +208,7 @@ function ItemsViewModel(active_status) {
         var modified_item = ko.utils.arrayFirst(self.items(), function(item) {
             return item.name() === action.item();
         });
-        modified_item.status(action.status());
+        modified_item.last_action(action);
     });
 }
 
@@ -251,7 +245,7 @@ function ActionsViewModel() {
         send_data = { "event_id": base_view_model.event().current().id() }
         json_request(actions_uri, "GET", send_data).done(function(ret_data) {
             var mapped_actions = $.map(ret_data, function(action) { 
-                return new ActionItemModel(action); 
+                return new ActionModel(action); 
             });
             self.recent(mapped_actions);
         });

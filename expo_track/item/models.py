@@ -10,8 +10,9 @@ class Item(db.Model):
     name = db.Column(db.String(64), nullable=False)
     description = db.Column(db.String(1024))
 
-    # Current status of item, should match newest action on item
-    status = db.Column(db.Integer, nullable=False)
+    # Last action performed on item, representing its current status
+    last_action_id = db.Column(db.Integer, db.ForeignKey('action.id', use_alter=True, name='fk_last_action'), nullable=True)
+    last_action = db.relationship('Action', primaryjoin='Item.last_action_id == Action.id', post_update=True)
     
     # Arbitrary number for tracking item
     tracking_number = db.Column(db.Integer)
@@ -19,7 +20,7 @@ class Item(db.Model):
     owner = db.relationship('Team', backref=db.backref('owned_items', lazy='dynamic'))
     owner_id = db.Column(db.Integer, db.ForeignKey('team.id'))
 
-    actions = db.relationship('Action', backref=db.backref('item'), cascade='all, delete, delete-orphan')
+    actions = db.relationship('Action', backref=db.backref('item'), cascade='all, delete, delete-orphan', primaryjoin='Item.id == Action.item_id')
 
 class Action(db.Model):
     'An action performed by an individual on an item at an event'

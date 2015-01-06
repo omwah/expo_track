@@ -198,7 +198,7 @@ function ItemsApiListModel() {
           },
           { headerText: "Status",
             rowText: function(row) { 
-                return row.model().status;
+                return row.model().last_action().status;
             }, 
             isSortable: true, rowClass: "col-md-3",
           },

@@ -101,7 +101,8 @@ for radio_num in range(1, 61):
     name = "Radio #%02.d" % radio_num
     desc = "Etekcity Radio"
     # Will update status to something different possibility in action loop
-    radio = models.Item(name=name, description=desc, status=0, tracking_number=barcode)
+    radio = models.Item(name=name, description=desc, tracking_number=barcode)
+    radio.last_action = models.Action(item=radio, status=STATUS_CHECK_IN, person=admin_person, event=linux_expo)
     items.append(radio)
     db.session.add(radio)
 
@@ -160,8 +161,7 @@ for count in range(num_actions):
     which_person = random.randrange(len(people))
     dt = time_beg + timedelta(hours=count) + timedelta(minutes=random.randrange(59))
     action = models.Action(item=items[which_item], status=status_type, person=people[which_person], event=linux_expo, date=dt)
-    # Set current status to latest status item
-    items[which_item].status = status_type
+    items[which_item].last_action = action
     db.session.add(action)
 
 db.session.commit()

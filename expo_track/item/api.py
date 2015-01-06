@@ -1,5 +1,6 @@
 from flask.ext.restful import Resource, fields, marshal, marshal_with, reqparse
-from flask.ext.login import login_required
+from flask.ext.login import login_required, current_user
+
 from sqlalchemy.sql import or_
 from sqlalchemy.sql.expression import asc, desc
 
@@ -10,22 +11,11 @@ from ..user.decorators import has_permission
 from models import Item, Action
 from constants import STATUS_TYPES, STATUS_OPPOSITES, STATUS_CHECK_IN, NULL_ACTION_PERSON_NAME
 from ..person.api import nested_person_fields
+from ..event.api import closest_event_query
 
 class StatusField(fields.Raw):
     def format(self, value):
         return { 'code': value, 'name': STATUS_TYPES.get(value, None) }
-
-item_fields = {
-    'id': fields.String,
-    'name': fields.String,
-    'description': fields.String,
-    'status': StatusField,
-    'tracking_number': fields.String,
-    'owner': fields.Nested({ 'id': fields.String,
-                             'name': fields.String,
-                             'uri': SafeUrlField('team') }),
-    'uri': SafeUrlField('item'),
-}
 
 nested_person = fields.Nested(nested_person_fields)
 
@@ -33,7 +23,7 @@ class ActionPersonField(fields.Raw):
     'Handles case where person might have been removed gracefully'
     
     def output(self, key, obj):
-        if obj.person == None:
+        if obj != None and obj.person == None:
             return { 'given_name': NULL_ACTION_PERSON_NAME,
                      'family_name': None }
         else:
@@ -56,6 +46,19 @@ action_fields = {
                                 'uri': SafeUrlField('location') },
                                allow_null=True),
     'uri': SafeUrlField('action'),
+}
+
+item_fields = {
+    'id': fields.String,
+    'name': fields.String,
+    'description': fields.String,
+    'last_action': fields.Nested(action_fields),
+    'status': StatusField,
+    'tracking_number': fields.String,
+    'owner': fields.Nested({ 'id': fields.String,
+                             'name': fields.String,
+                             'uri': SafeUrlField('team') }),
+    'uri': SafeUrlField('item'),
 }
 
 def item_parser():
@@ -86,7 +89,11 @@ class ItemListResource(Resource):
     def post(self):
         args = item_parser().parse_args()
 
-        item = Item(name=args.name, tracking_number=args.tracking_number, status=STATUS_CHECK_IN)
+        item = Item(name=args.name, tracking_number=args.tracking_number)
+
+        # Put in a last action that the item is checked in at the closest occuring event
+        closest_event = closest_event_query().first_or_404()
+        item.last_action = Action(item=item, status=STATUS_CHECK_IN, person=current_user.person, event=closest_event)
 
         db.session.add(item)
         db.session.commit()

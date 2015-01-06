@@ -66,6 +66,9 @@ def event_parser():
     parser.add_argument('end_date', type=event_date, required=True)
     return parser
 
+def closest_event_query():
+    return Event.query.filter(Event.begin_date >= date.today()).order_by(asc(Event.begin_date))
+
 class EventListResource(Resource):
 
     @login_required
@@ -77,7 +80,7 @@ class EventListResource(Resource):
 
         if args.soonest:
             # Events occuring closest to current time and ordered by beginning date
-            events = Event.query.filter(Event.begin_date >= date.today()).order_by(asc(Event.begin_date)).all()
+            events = closest_event_query().all()
         else:
             events = Event.query.all()
 
