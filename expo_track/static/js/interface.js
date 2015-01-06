@@ -174,7 +174,7 @@ function ItemsViewModel(active_status) {
             { headerText: "Who", rowText: function(item) {
                   return item.last_action().who().display_name();
               },
-              isSortable: false, rowClass: "col-md-3",
+              isSortable: false, rowClass: "col-md-2",
             },
         ],
         customAction: function() {

@@ -5,7 +5,7 @@ from sqlalchemy.sql import or_
 from sqlalchemy.sql.expression import asc, desc
 
 from ..app import db
-from ..utils import SafeUrlField
+from ..utils import SafeUrlField, int_or_none
 from ..user.decorators import has_permission
 
 from models import Item, Action
@@ -65,6 +65,7 @@ def item_parser():
     parser = reqparse.RequestParser()
     parser.add_argument('name', type=str, required=True)
     parser.add_argument('tracking_number', type=str, required=True)
+    parser.add_argument('owner_id', type=int_or_none)
     return parser
 
 class ItemListResource(Resource):
@@ -89,7 +90,7 @@ class ItemListResource(Resource):
     def post(self):
         args = item_parser().parse_args()
 
-        item = Item(name=args.name, tracking_number=args.tracking_number)
+        item = Item(name=args.name, tracking_number=args.tracking_number, owner_id=owner_id)
 
         # Put in a last action that the item is checked in at the closest occuring event
         closest_event = closest_event_query().first_or_404()
@@ -117,6 +118,7 @@ class ItemResource(Resource):
         
         item.name = args.name
         item.tracking_number = args.tracking_number
+        item.owner_id = args.owner_id
 
         db.session.commit()
 

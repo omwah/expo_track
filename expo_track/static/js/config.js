@@ -194,7 +194,7 @@ function ItemsApiListModel() {
             rowText: function(row) { 
                 return row.model().name;
             },
-            isSortable: true, rowClass: "col-md-6",
+            isSortable: true, rowClass: "col-md-3",
           },
           { headerText: "Status",
             rowText: function(row) { 
@@ -202,8 +202,47 @@ function ItemsApiListModel() {
             }, 
             isSortable: true, rowClass: "col-md-3",
           },
+          { headerText: "Owner",
+            rowText: function(row) { 
+                if (row.model().owner() != null) {
+                    return row.model().owner().name;
+                } else {
+                    return "";
+                }
+            }, 
+            isSortable: true, rowClass: "col-md-3",
+          },
         ],
         "item", items_uri);
+
+    self.teams = function() {
+        // List of teams with null at the beginning for no associated owner
+        var teams = base_view_model.teams().data_elements().slice(0);
+        teams.unshift(null);
+        return teams;
+    }
+
+    self.editing_owner_id = ko.observable();
+
+    self.edited_item.subscribe(function (edited_item) {
+        if (edited_item) {
+            self.editing_owner_id(edited_item.model().owner().id());
+        }
+    });
+
+    self.editing_owner_id.subscribe(function(updated_owner_id) {
+        var new_owner;
+        if(updated_owner_id != null) {
+            new_owner = ko.utils.arrayFirst(base_view_model.teams().data_elements(), function(elem) {
+                if (elem && elem.model().id() == updated_owner_id) {
+                    return true;
+                }
+            }).model();
+        } else {
+            new_owner = null;
+        }
+        self.edited_item().model().owner(new_owner);
+    });
 
     return self;
 }
@@ -441,7 +480,7 @@ function UserApiListModel() {
 
     self.editing_person_id.subscribe(function(updated_person_id) {
         if(updated_person_id != null) {
-            new_person = ko.utils.arrayFirst(base_view_model.people().data_elements(), function(elem) {
+            var new_person = ko.utils.arrayFirst(base_view_model.people().data_elements(), function(elem) {
                 if (elem && elem.model().id() == updated_person_id) {
                     return true;
                 }

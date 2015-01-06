@@ -6,7 +6,7 @@ from flask.ext.login import login_required
 from sqlalchemy.sql import asc
 
 from ..app import db
-from ..utils import SafeUrlField
+from ..utils import SafeUrlField, int_or_none
 from ..user.decorators import has_permission
 
 from models import Event, Location, Team
@@ -194,13 +194,6 @@ class LocationResource(Resource):
         db.session.commit()
 
         return { 'delete': True }
-
-# Allow primary_location_id to be either an integer or None
-def int_or_none(value):
-    if value == None:
-        return None
-    else:
-        return int(value)
 
 def team_parser():
     parser = reqparse.RequestParser()

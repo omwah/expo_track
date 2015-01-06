@@ -39,22 +39,6 @@ function ActionModel(data) {
     }
 }
 
-function ItemModel(data) {
-    var self = this;
-
-    var attributes =
-        ["id", "name", "description", "tracking_number", "uri"];
-    make_api_attributes(self, data, attributes);
-
-    self.name.extend({required: true});
-
-    if (data && data.last_action) {
-        self.last_action = ko.observable(new ActionModel(data.last_action));
-    } else {
-        self.last_action = ko.observable(null);
-    }   
-}
-
 function ContactModel(data) {
     var self = this;
 
@@ -178,6 +162,36 @@ function TeamModel(data) {
             return null;
         }
     });
+}
+
+function ItemModel(data) {
+    var self = this;
+
+    var attributes =
+        ["id", "name", "description", "tracking_number", "uri"];
+    make_api_attributes(self, data, attributes);
+
+    self.name.extend({required: true});
+
+    if(data && data.owner) {
+        self.owner = ko.observable(new TeamModel(data.owner));
+    } else {
+        self.owner = ko.observable(new TeamModel());
+    }
+
+    self.owner_id = ko.computed(function() {
+        if (self.owner()) {
+            return self.owner().id();
+        } else {
+            return null;
+        }
+    });
+
+    if (data && data.last_action) {
+        self.last_action = ko.observable(new ActionModel(data.last_action));
+    } else {
+        self.last_action = ko.observable(null);
+    }   
 }
 
 function UserModel(data) {

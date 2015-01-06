@@ -24,3 +24,10 @@ class SafeUrlField(fields.Url):
             # Rare annoying error that was..
             db.session.refresh(obj)
             return super(SafeUrlField, self).output(key, obj)
+
+# Allow id to be either an integer or None
+def int_or_none(value):
+    if value == None:
+        return None
+    else:
+        return int(value)

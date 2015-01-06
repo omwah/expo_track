@@ -23,7 +23,7 @@
 
         <div class="form-group">
             <label>Person</label>
-            <select data-bind="options: $root.people().data_elements, optionsValue: function(item) { return item.model().id() }, optionsText: function(item) { return item.model().display_name() }, value: $parent.editing_person_id" class="form-control">
+            <select data-bind="options: $root.people().data_elements, optionsValue: function(person) { return person.model().id() }, optionsText: function(person) { return person.model().display_name() }, value: $parent.editing_person_id" class="form-control">
             </select>
         </div>
 

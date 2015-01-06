@@ -18,6 +18,12 @@
             <input data-bind="value: model().tracking_number" type="text" class="form-control" id="item-tracking-no" placeholder="">
         </div>
 
+        <div class="form-group">
+            <label>Owner</label>
+            <select data-bind="options: $parent.teams(), optionsValue: function(team) { return team ? team.model().id() : null }, optionsText: function(team) { return team ? team.model().name() : null }, value: $parent.editing_owner_id" class="form-control">
+            </select>
+        </div>
+
         <button data-bind="click: $parent.cancel_edit" class="btn btn-default">Cancel</button>
         <button data-bind="click: $parent.finish_edit" class="btn btn-default btn-primary">Apply</button>
     </div>
