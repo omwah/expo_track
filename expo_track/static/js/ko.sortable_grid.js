@@ -169,7 +169,7 @@
                                    <td class=\"col-md-1\">\
                                        <div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"Actions\">\
                                            <!-- ko foreach: $parent.actions -->\
-                                           <!-- if: has_permission.call($parent) -->\
+                                           <!-- ko if: has_permission.call($parent) -->\
                                            <button data-bind=\"click: function() {click.call($parent)}\" type=\"button\" class=\"btn btn-default\"><span data-bind=\"css: icon_class\"></span></button>\
                                            <!-- /ko -->\
                                            <!-- /ko -->\
