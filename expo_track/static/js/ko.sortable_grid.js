@@ -39,16 +39,20 @@
 
             // Add default values to action definitions
             ko.utils.arrayForEach(this.actions, function(action_def) {
-                if (!action_def.hasOwnProperty('click')) {
-                    action_def.click = function() { alert('click property not defined for this action!'); };
+                if (!action_def.hasOwnProperty("click")) {
+                    action_def.click = function() { alert("click property not defined for this action!"); };
                 }
 
-                if (!action_def.hasOwnProperty('icon_class')) {
-                    action_def.icon_class = 'glyphicon glyphicon-th';
+                if (!action_def.hasOwnProperty("icon_class")) {
+                    action_def.icon_class = "glyphicon glyphicon-th";
                 }
 
-                if (!action_def.hasOwnProperty('has_permission')) {
+                if (!action_def.hasOwnProperty("has_permission")) {
                     action_def.has_permission = function() { return true; };
+                }
+
+                if (!action_def.hasOwnProperty("title")) {
+                    action_def.title = "";
                 }
             });
 
@@ -170,7 +174,7 @@
                                        <div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"Actions\">\
                                            <!-- ko foreach: $parent.actions -->\
                                            <!-- ko if: has_permission.call($parent) -->\
-                                           <button data-bind=\"click: function() {click.call($parent)}\" type=\"button\" class=\"btn btn-default\"><span data-bind=\"css: icon_class\"></span></button>\
+                                           <button data-bind=\"click: function() {click.call($parent)}, attr: { title: title}\" type=\"button\" class=\"btn btn-default\"><span data-bind=\"css: icon_class\"></span></button>\
                                            <!-- /ko -->\
                                            <!-- /ko -->\
                                        </div>\

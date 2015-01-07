@@ -152,6 +152,7 @@ function ItemsViewModel(active_status) {
     var status_icons = [ "fa fa-download", "fa fa-upload", "fa fa-question" ];
     for (var status_id in status_types) {
         self.grid_actions.push({
+            title: status_command_names[status_id],
             click: (function(status_id) {
                 return function() {
                     base_view_model.perform().begin_action(this, status_id);
