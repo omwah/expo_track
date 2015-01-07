@@ -177,10 +177,12 @@ function ItemsViewModel(active_status) {
               isSortable: false, rowClass: "col-md-2",
             },
         ],
-        customAction: function() {
-            base_view_model.perform().begin_action(this);
-        },
-        customActionClass: "glyphicon glyphicon-ok",
+        actions: [
+            { click: function() {
+                base_view_model.perform().begin_action(this);
+              },
+            },
+        ],
         pageSize: 10,
     });
 

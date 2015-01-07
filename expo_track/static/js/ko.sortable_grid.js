@@ -30,18 +30,38 @@
             this.sortByClassDesc = configuration.sortByClassDesc || 'glyphicon glyphicon-arrow-down';
             this.sortCaseInsensitive = configuration.sortCaseInsensitive || true;
                         
-            // Call back functions for editing or removing row data
-            this.beginEdit = configuration.beginEdit || undefined;
-            this.beginEditClass = configuration.beginEditClass || "glyphicon glyphicon-edit";
-            this.canEdit = configuration.canEdit || function() { return this.beginEdit; };
+            // Call back functions connected to buttons
+            // An array of associative arrays with: 'click', 'icon_class', 'has_permission'
+            // Only 'click' is required and defines the callback for the click action on the button
+            // 'icon_class' defines the icon used for the button
+            // 'has_permission' defines a function to check of the button can be displayed
+            this.actions = configuration.actions || [];
 
-            this.remove = configuration.remove || undefined;
-            this.removeClass = configuration.removeClass || "glyphicon glyphicon-remove";
-            this.canRemove = configuration.canRemove || function() { return this.remove; };
+            // Add default values to action definitions
+            ko.utils.arrayForEach(this.actions, function(action_def) {
+                if (!action_def.hasOwnProperty('click')) {
+                    action_def.click = function() { alert('click property not defined for this action!'); };
+                }
 
-            this.customAction = configuration.customAction || undefined;
-            this.customActionClass = configuration.customActionClass || 'glyphicon glyphicon-th';
-            this.canCustom = configuration.canCustom || function() { return this.customAction; };
+                if (!action_def.hasOwnProperty('icon_class')) {
+                    action_def.icon_class = 'glyphicon glyphicon-th';
+                }
+
+                if (!action_def.hasOwnProperty('has_permission')) {
+                    action_def.has_permission = function() { return true; };
+                }
+            });
+
+            // Function to determine if we should display the action column
+            this.shouldDisplayActionCol = function() {
+                var do_display = false;
+                ko.utils.arrayForEach(this.actions, function(action_def) {
+                    if (action_def.has_permission.call(this)) {
+                        do_display = true;
+                    }
+                });
+                return do_display;
+            }
 
             this.lastSortedColumn = ko.observable('');
             this.lastSort = ko.observable('Desc');
@@ -135,7 +155,7 @@
                                     <th><span data-bind=\"text: headerText\"></span></th>\
                                     <!-- /ko -->\
                                 <!-- /ko -->\
-                                <!-- ko if: canEdit() || canRemove() || canCustom() -->\
+                                <!-- ko if: shouldDisplayActionCol() -->\
                                     <th>Actions</th>\
                                 <!-- /ko -->\
                                 </tr>\
@@ -145,17 +165,13 @@
                                <!-- ko foreach: $parent.columns -->\
                                    <td data-bind=\"text: typeof rowText == 'function' ? rowText($parent) : $parent[rowText], css: typeof rowClass !== 'undefined' ? rowClass : '' \"></td>\
                                <!-- /ko -->\
-                               <!-- ko if: $parent.canEdit() || $parent.canRemove() || $parent.canCustom() -->\
+                               <!-- ko if: $parent.shouldDisplayActionCol() -->\
                                    <td class=\"col-md-1\">\
                                        <div class=\"btn-group btn-group-xs\" role=\"group\" aria-label=\"Actions\">\
-                                           <!-- ko if: $parent.customAction -->\
-                                           <button data-bind=\"click: $parent.customAction\" type=\"button\" class=\"btn btn-default\"><span data-bind=\"css: $parent.customActionClass\"></span></button>\
+                                           <!-- ko foreach: $parent.actions -->\
+                                           <!-- if: has_permission.call($parent) -->\
+                                           <button data-bind=\"click: function() {click.call($parent)}\" type=\"button\" class=\"btn btn-default\"><span data-bind=\"css: icon_class\"></span></button>\
                                            <!-- /ko -->\
-                                           <!-- ko if: $parent.beginEdit -->\
-                                           <button data-bind=\"click: $parent.beginEdit\" type=\"button\" class=\"btn btn-default\"><span data-bind=\"css: $parent.beginEditClass\"></span></button>\
-                                           <!-- /ko -->\
-                                           <!-- ko if: $parent.remove -->\
-                                           <button data-bind=\"click: $parent.remove\" type=\"button\" class=\"btn btn-default\"><span data-bind=\"css: $parent.removeClass\"></span></button>\
                                            <!-- /ko -->\
                                        </div>\
                                    </td>\

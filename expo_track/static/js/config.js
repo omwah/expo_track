@@ -119,14 +119,16 @@ function ApiListModel(model_type, columns, perm_suffix, uri) {
         data: self.data_elements,
         columns: columns,
         pageSize: 10,
-        beginEdit: self.begin_edit,
-        canEdit: function() { 
-            return auth_view_model.has_permission("edit_" + self.perm_suffix) 
-        },
-        remove: self.remove,
-        canRemove: function() { 
-            return auth_view_model.has_permission("delete_" + self.perm_suffix) 
-        },
+        actions: [
+            { click: self.begin_edit, icon_class: "glyphicon glyphicon-edit", has_permission: function() { 
+                return auth_view_model.has_permission("edit_" + self.perm_suffix) 
+              },
+            },
+            { click: self.remove, icon_class: "glyphicon glyphicon-remove", has_permission: function() { 
+                return auth_view_model.has_permission("delete_" + self.perm_suffix) 
+              },
+            },
+        ],
     });
 
     self.load = function(send_data) {
