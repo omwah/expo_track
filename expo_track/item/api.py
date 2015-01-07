@@ -188,7 +188,7 @@ class ActionListResource(Resource):
                 status=args.status, note=args.note, 
                 person_id=args.person_id, event_id=args.event_id,
                 location_id=args.location_id)
-
+        item.last_action = new_action;
 
         db.session.add(new_action)
         db.session.commit()
