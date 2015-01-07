@@ -42,7 +42,7 @@ function PerformActionModel(all_items) {
 
     self.modal_title = ko.observable("");
     self.selected_status = ko.observable("0");
-    self.hide_status = ko.observable();
+    self.hide_status = ko.observable(false);
     self.selected_item = ko.observable();
     self.hide_items = ko.observable(false);
     self.people = ko.observableArray([]);
@@ -97,29 +97,18 @@ function PerformActionModel(all_items) {
         return true;
     }
 
-    self.begin_action = function(item) {
+    self.begin_action = function(item, sel_status) {
         // Do some additional work when we are given a single item to act upon
         if (item instanceof ItemModel) {
-            self.modal_title(item.name());
+            self.modal_title(status_command_names[sel_status] + ": " + item.name());
             self.hide_items(true);
+            self.hide_status(true)
             self.selected_item(item.id());
-
-            // Pick the first status that is not the same as the items existing
-            // status to be the selected one
-            // Also select the current status as one to hide in the check boxes
-            var item_sel_status = null;
-            for (var status_id in status_types) {
-                if(!item_sel_status && item.last_action().status() !== status_types[status_id]) {
-                    item_sel_status = status_id;
-                } else if (item.last_action().status() === status_types[status_id]) {
-                    self.hide_status(status_id);
-                }
-            }
-            self.selected_status(item_sel_status);
+            self.selected_status(sel_status);
         } else {
             self.modal_title("Fast Item Action");
             self.hide_items(false);
-            self.hide_status(null);
+            self.hide_status(false);
             self.selected_item(self.available_items()[0]);
             self.selected_status("0");
         }
@@ -155,6 +144,28 @@ function ItemsViewModel(active_status) {
     
     self.items = ko.observableArray([]);
 
+    // Create action buttons that will be used in grid for
+    // performing item actions. Too many uses of the same word: "action"!
+    self.grid_actions = [];
+
+    // For status: Checked In, Checked Out, Missing
+    var status_icons = [ "fa fa-download", "fa fa-upload", "fa fa-question" ];
+    for (var status_id in status_types) {
+        self.grid_actions.push({
+            click: (function(status_id) {
+                return function() {
+                    base_view_model.perform().begin_action(this, status_id);
+                }
+            })(status_id),
+            has_permission: (function(status_id) { 
+                return function() {
+                    return active_status() !== status_types[status_id];
+                }
+            })(status_id),
+            icon_class: status_icons[status_id],
+        });
+    }
+
     self.grid_view_model = new ko.sortableGrid.viewModel({
         data: ko.computed(function() {
             return ko.utils.arrayFilter(self.items(), function(item) {
@@ -177,12 +188,7 @@ function ItemsViewModel(active_status) {
               isSortable: false, rowClass: "col-md-2",
             },
         ],
-        actions: [
-            { click: function() {
-                base_view_model.perform().begin_action(this);
-              },
-            },
-        ],
+        actions: self.grid_actions,
         pageSize: 10,
     });
 

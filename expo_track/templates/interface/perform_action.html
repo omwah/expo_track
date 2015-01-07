@@ -7,14 +7,15 @@
             </div>
             <div class="modal-body">
                 
-                <div class="row">
+                <div data-bind="visible: !hide_status()" id="row">
                     <div class="col-md-12">
                         <label for="action-types">Action</label>
                     </div>
                 </div>
-                    <div id="row">
-                    {% for type_code, type_name in status_command_names  %}
-                    <div data-bind="visible: hide_status() !== '{{ type_code }}'" class="col-md-{{ (12 / status_command_names|length)|int }}">
+
+                <div data-bind="visible: !hide_status()" id="row">
+                    {% for type_code, type_name in status_command_names.items() %}
+                    <div class="col-md-{{ (12 / status_command_names|length)|int }}">
                         <label class="radio-inline">
                             <input data-bind="checked: selected_status" type="radio" name="status-type" value="{{ type_code }}">{{ type_name }}
                         </label>

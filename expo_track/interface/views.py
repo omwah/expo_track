@@ -12,7 +12,7 @@ mod = Blueprint('interface', __name__, url_prefix='')
 def index():
     return render_template('interface/interface.html',
             status_types=STATUS_TYPES,
-            status_command_names=STATUS_COMMAND_NAMES.items(),
+            status_command_names=STATUS_COMMAND_NAMES,
             status_opposites=STATUS_OPPOSITES)
 
 @mod.route('/config')

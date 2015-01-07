@@ -6,6 +6,7 @@
 {% block additional_js %}
     <script>
         var status_types = {{ status_types|tojson }};
+        var status_command_names = {{ status_command_names|tojson }};
         var status_opposites = {{ status_opposites|tojson }};
     </script>
     <script src="{{ url_for('static', filename='js/interface.js') }}"></script>
