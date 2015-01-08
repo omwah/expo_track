@@ -2,7 +2,12 @@
     <div data-bind="with: event" id="event-info" class="col-md-9">
         <h2 data-bind="text: current().name"></h2>
         <p><span data-bind="text: current().begin_date_fmt"></span> - <span data-bind="text: current().end_date_fmt"></span></p>
+        <!-- ko if: all().length > 1 -->
         <p><a data-bind="click: begin_change" id="change-event" href="#">Change Event</a>&nbsp;</p>
+        <!-- /ko -->
+        <!-- ko if: all().length === 1 -->
+        <p>&nbsp;</p>
+        <!-- /ko -->
     </div>
     <div class="col-md-3">
         <button data-bind="click: perform().begin_action" type="button" class="btn btn-primary btn-lg">Fast Check In/Out</button>
