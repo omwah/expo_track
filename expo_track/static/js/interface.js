@@ -47,6 +47,7 @@ function PerformActionModel(all_items) {
     self.hide_items = ko.observable(false);
     self.people = ko.observableArray([]);
     self.selected_person = ko.observable();
+    self.modal_loaded = false;
 
     self.add_person = ko.observable(new AddPersonModel(self));
 
@@ -72,58 +73,65 @@ function PerformActionModel(all_items) {
         self.load_people();
     });
 
+    self.selected_status.subscribe(function() {
+        // Only update relevant person when the modal is loaded
+        // so we don't call it twice when loading the modal
+        //if(self.modal_loaded) {
+            self.select_relevant_person();
+        //}
+    });
+
     // Select the relevant person who last performed the opposite
     // action of the one that is selected on the item selected
     self.select_relevant_person = function() {
         if(self.selected_item()) {
-            send_data = { 
-                status: status_opposites[self.selected_status()],
-                item_id: self.selected_item(),
-                event_id: base_view_model.event().current().id()
-            }
-
-            json_request(actions_uri, "GET", send_data).done(function(ret_data) {
-                // Only select a person if the person data coming back is not null.
-                // will be null when no person has performed a certain action on an item yet
-                if (ret_data.length > 0 && typeof ret_data[0].person !== undefined) {
-                    self.selected_person(ret_data[0].person.id);
-                } else {
-                    self.selected_person(undefined);
+            var matched_item = ko.utils.arrayFirst(self.all_items(), function(item) {
+                if(self.selected_item() == item.id()) {
+                    return true;
                 }
             });
+            self.selected_person(matched_item.last_action().who().id());
         }
 
-        // When used as click handler, allow default event handling
-        return true;
+       // When used as click handler, allow default event handling
+       return true;
     }
 
     self.begin_action = function(item, sel_status) {
         // Do some additional work when we are given a single item to act upon
         if (item instanceof ItemModel) {
+            // Do selected status first as there is a dependency between
+            // selected_status and available_items and the form element
+            // selected_it does not update properly on first page load
+            // unless this is done first. Maybe because available_items is never run,
+            // I really don't know why for sure...
+            self.selected_status(sel_status);
             self.modal_title(status_command_names[sel_status] + ": " + item.name());
             self.hide_items(true);
             self.hide_status(true)
             self.selected_item(item.id());
-            self.selected_status(sel_status);
+            self.selected_item(item.id());
         } else {
+            self.selected_status("0");
             self.modal_title("Fast Item Action");
             self.hide_items(false);
             self.hide_status(false);
-            self.selected_item(self.available_items()[0]);
-            self.selected_status("0");
+            self.selected_item(self.available_items()[0].id());
         }
-
-        // If modal was last canceled then cancel any person adding
-        self.add_person().cancel_add(false);
 
         // Select a person based on the item currently selected
         self.select_relevant_person();
 
+        // If modal was last canceled then cancel any person adding
+        self.add_person().cancel_add(false);
+
         $("#perform-action-modal").modal("show");
+        self.modal_loaded = true;
     }
 
     self.finish_action = function() {
         $("#perform-action-modal").modal("hide");
+        self.modal_loaded = false;
 
         // Save changes to server and update recents list
         action_data = { 'status': self.selected_status(),
@@ -142,7 +150,12 @@ function PerformActionModel(all_items) {
 function ItemsViewModel(active_status) {
     var self = this;
     
-    self.items = ko.observableArray([]);
+    self.all_items = ko.observableArray([]);
+    self.visible_items = ko.computed(function() {
+        return ko.utils.arrayFilter(self.all_items(), function(item) {
+            return item.last_action().status() === active_status();
+        });
+    });
 
     // Create action buttons that will be used in grid for
     // performing item actions. Too many uses of the same word: "action"!
@@ -168,11 +181,7 @@ function ItemsViewModel(active_status) {
     }
 
     self.grid_view_model = new ko.sortableGrid.viewModel({
-        data: ko.computed(function() {
-            return ko.utils.arrayFilter(self.items(), function(item) {
-                return item.last_action().status() === active_status();
-            });
-        }),
+        data: self.visible_items,
         columns: [
             { headerText: "Number", rowText: "tracking_number",
               isSortable: false, rowClass: "col-md-2",
@@ -194,12 +203,12 @@ function ItemsViewModel(active_status) {
     });
 
     self.load = function() {
-        self.items([]);
+        self.all_items([]);
         json_request(items_uri, "GET").done(function(ret_data) {
             var mapped_items = $.map(ret_data, function(item) { 
                 return new ItemModel(item);
             });
-            self.items(mapped_items);
+            self.all_items(mapped_items);
         });
     };
 
@@ -209,12 +218,12 @@ function ItemsViewModel(active_status) {
 
     $(document).on("logout", function() {
         // Clear items on page on logout
-        self.items([]);
+        self.all_items([]);
     });
 
     $(document).on("item_action", function(event, action) {
         // Modify the status of the item who has just had its status change
-        var modified_item = ko.utils.arrayFirst(self.items(), function(item) {
+        var modified_item = ko.utils.arrayFirst(self.all_items(), function(item) {
             return item.name() === action.item();
         });
         modified_item.last_action(action);
@@ -336,7 +345,7 @@ function BaseViewModel() {
 
     self.auth = ko.observable(auth_view_model);
     self.items = ko.observable(new ItemsViewModel(self.active_tab));
-    self.perform = ko.observable(new PerformActionModel(self.items().items));
+    self.perform = ko.observable(new PerformActionModel(self.items().all_items));
     self.actions = ko.observable(new ActionsViewModel());
 
     self.event = ko.observable(new EventViewModel());
