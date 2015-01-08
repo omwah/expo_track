@@ -65,7 +65,8 @@ item_fields = {
 def item_parser():
     parser = reqparse.RequestParser()
     parser.add_argument('name', type=str, required=True)
-    parser.add_argument('tracking_number', type=str, required=True)
+    parser.add_argument('tracking_number', type=str)
+    parser.add_argument('description', type=str)
     parser.add_argument('owner_id', type=int_or_none)
     return parser
 
@@ -91,7 +92,7 @@ class ItemListResource(Resource):
     def post(self):
         args = item_parser().parse_args()
 
-        item = Item(name=args.name, tracking_number=args.tracking_number, owner_id=owner_id)
+        item = Item(name=args.name, tracking_number=args.tracking_number, description=args.description, owner_id=owner_id)
 
         # Put in a last action that the item is checked in at the closest occuring event
         closest_event = closest_event_query().first_or_404()
@@ -119,6 +120,7 @@ class ItemResource(Resource):
         
         item.name = args.name
         item.tracking_number = args.tracking_number
+        item.description = args.description
         item.owner_id = args.owner_id
 
         db.session.commit()

@@ -13,9 +13,14 @@
             <span data-bind="validationMessage: model().name" class="validationMessage"></span>
         </div>
 
-         <div class="form-group">
+        <div class="form-group">
             <label for="item-tracking-no">Tracking Number</label>
             <input data-bind="value: model().tracking_number" type="text" class="form-control" id="item-tracking-no" placeholder="">
+        </div>
+
+        <div class="form-group">
+            <label for="item-description">Description</label>
+            <textarea data-bind="value: model().description" rows=5 class="form-control" id="item-description" placeholder=""></textarea>
         </div>
 
         <div class="form-group">
