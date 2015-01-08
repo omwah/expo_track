@@ -147,8 +147,23 @@ function PerformActionModel(all_items) {
 
 }
 
+function ItemDetailsViewModel() {
+    var self = this;
+
+    self.modal_title = ko.observable("");
+    self.item = ko.observable();
+
+    self.show = function(item) {
+        self.item(item);
+        self.modal_title("Details for " + item.name());
+        $("#item-details-modal").modal("show");
+    }
+}
+
 function ItemsViewModel(active_status) {
     var self = this;
+
+    self.item_details = ko.observable(new ItemDetailsViewModel());
     
     self.all_items = ko.observableArray([]);
     self.visible_items = ko.computed(function() {
@@ -161,8 +176,17 @@ function ItemsViewModel(active_status) {
     // performing item actions. Too many uses of the same word: "action"!
     self.grid_actions = [];
 
+    // Button form bringing up the detailed information screen
+    self.grid_actions.push({
+        title: "Item Details",
+        click: function() {
+            self.item_details().show(this);
+        },
+        icon_class: "fa fa-info fa-fw",
+    });
+
     // For status: Checked In, Checked Out, Missing
-    var status_icons = [ "fa fa-download", "fa fa-upload", "fa fa-question" ];
+    var status_icons = [ "fa fa-download fa-fw", "fa fa-upload fa-fw", "fa fa-question fa-fw" ];
     for (var status_id in status_types) {
         self.grid_actions.push({
             title: status_command_names[status_id],

@@ -57,7 +57,8 @@ item_fields = {
     'tracking_number': fields.String,
     'owner': fields.Nested({ 'id': fields.String,
                              'name': fields.String,
-                             'uri': SafeUrlField('team') }),
+                             'uri': SafeUrlField('team') },
+                             allow_null=True),
     'uri': SafeUrlField('item'),
 }
 

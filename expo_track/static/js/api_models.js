@@ -176,7 +176,7 @@ function ItemModel(data) {
     if(data && data.owner) {
         self.owner = ko.observable(new TeamModel(data.owner));
     } else {
-        self.owner = ko.observable(new TeamModel());
+        self.owner = ko.observable(null);
     }
 
     self.owner_id = ko.computed(function() {

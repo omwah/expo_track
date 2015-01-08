@@ -227,7 +227,7 @@ function ItemsApiListModel() {
     self.editing_owner_id = ko.observable();
 
     self.edited_item.subscribe(function (edited_item) {
-        if (edited_item) {
+        if (edited_item && edited_item.model().owner()) {
             self.editing_owner_id(edited_item.model().owner().id());
         }
     });
