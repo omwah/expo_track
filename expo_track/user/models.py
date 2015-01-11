@@ -25,7 +25,7 @@ class User(db.Model, UserMixin):
     person = db.relationship('Person', backref=db.backref('user', lazy='dynamic'), uselist=False)
 
     # Password data and methods
-    _password = db.Column('password', db.String(64), nullable=False)
+    _password = db.Column('password', db.String(128), nullable=False)
 
     def _get_password(self):
         return self._password
