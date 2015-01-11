@@ -27,7 +27,7 @@ class Location(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String(128), nullable=False)
 
     event_id = db.Column(db.Integer, db.ForeignKey('event.id'))
     event = db.relationship('Event', backref=db.backref('locations', lazy='dynamic'))
@@ -39,7 +39,7 @@ class Team(db.Model):
 
     id = db.Column(db.Integer, primary_key=True)
 
-    name = db.Column(db.String, nullable=False)
+    name = db.Column(db.String(128), nullable=False)
 
     members = db.relationship('Person', secondary=team_members, backref=db.backref('pages', lazy='dynamic', single_parent=True))
 
