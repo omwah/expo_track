@@ -8,13 +8,13 @@
 
     <div data-bind="visible: active_tab() !== 'actions'">
         <div data-bind="with: items" class="row">
-            <div data-bind='sortableGrid: grid_view_model'></div>
+            <div id="items-grid" data-bind='sortableGrid: grid_view_model'></div>
         </div>
     </div>
 
     <div data-bind="visible: active_tab() === 'actions'">
         <div data-bind="with: actions" class="row">
-            <div data-bind='sortableGrid: grid_view_model'></div>
+            <div id="actions-grid" data-bind='sortableGrid: grid_view_model'></div>
         </div>
     </div>
 </div>

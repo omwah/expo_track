@@ -1,4 +1,29 @@
 // -------------------
+// Handle indicating loading
+// -------------------
+
+function SpinnerHandler() {
+    var spinner = new Spinner();
+    var spin_element = $("#items-grid")[0];
+
+    $(document).on("login", function() {
+        spinner.spin(spin_element);
+    });
+
+    $(document).on("logout", function() {
+        spinner.stop();
+    });
+
+    $(document).on("items_loaded", function() {
+        spinner.stop();
+    });
+}
+
+$( document ).ready(function() {
+    var spinner_handler = new SpinnerHandler();
+});
+
+// -------------------
 // Action interactions
 // -------------------
 
@@ -235,6 +260,7 @@ function ItemsViewModel(active_status) {
                 return new ItemModel(item);
             });
             self.all_items(mapped_items);
+            $(document).trigger("items_loaded");
         });
     };
 
@@ -387,6 +413,7 @@ function BaseViewModel() {
         self.tabs(tabs);
         self.active_tab(tabs[0].name);
         self.event().load();
+
     });
 
     self.active_tab.subscribe(function(new_active) {
