@@ -116,7 +116,9 @@ function PerformActionModel(all_items) {
             self.modal_title("Fast Item Action");
             self.hide_items(false);
             self.hide_status(false);
-            self.selected_item(self.available_items()[0].id());
+            if (self.available_items()[0]) {
+                self.selected_item(self.available_items()[0].id());
+            }
         }
 
         // Select a person based on the item currently selected
