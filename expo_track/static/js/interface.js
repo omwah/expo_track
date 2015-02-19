@@ -89,7 +89,10 @@ function PerformActionModel(all_items) {
             var mapped_people = $.map(ret_data, function(person) {
                 return new PersonModel(person);
             });
-            self.people(mapped_people);
+            var sort_by_lastname = function(person_a, person_b) {
+                return person_a.family_name() < person_b.family_name() ? -1 : 1;
+            }
+            self.people(mapped_people.sort(sort_by_lastname));
         });
     };
 
