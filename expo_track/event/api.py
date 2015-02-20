@@ -67,7 +67,7 @@ def event_parser():
     return parser
 
 def closest_event_query():
-    return Event.query.filter(Event.begin_date >= date.today()).order_by(asc(Event.begin_date))
+    return Event.query.order_by(asc(Event.begin_date))
 
 class EventListResource(Resource):
 
